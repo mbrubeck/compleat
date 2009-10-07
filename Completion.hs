@@ -7,3 +7,4 @@ token x y | y `isPrefixOf` x  = [x]
           | otherwise         = []
 
 (<|>) :: Completer -> Completer -> Completer
+a <|> b = \x -> a x ++ b x
