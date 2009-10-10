@@ -5,10 +5,7 @@ import Parser
 -- Example
 
 git :: Parser String
-git = do
-    str "git"
-    zeroOrMore gitOptions
-    gitCommand
+git = str "git" --> zeroOrMore gitOptions --> gitCommand
 
 gitOptions :: Parser String
 gitOptions = str "--version"
@@ -17,13 +14,21 @@ gitOptions = str "--version"
          <|> return ""
 
 gitCommand :: Parser String
-gitCommand = (str "add" >> zeroOrMore (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" >> zeroOrMore (str "-m" >> token <|> str "-a" <|> str "--amend"))
+gitCommand = (str "add" --> zeroOrMore (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" --> zeroOrMore (str "-m" >> token <|> str "-a" <|> str "--amend"))
 
 -- Completers
 
 complete :: Parser String -> String -> [String]
 complete p s = map fst $ parse (apply p) s
+
+(-->) :: Parser a -> Parser a -> Parser a
+p --> q = do
+    a <- p
+    inp <- getInput
+    case inp of
+        "" -> return a
+        _  -> q
 
 str :: String -> Parser String
 str s = do
@@ -34,7 +39,7 @@ str s = do
         _  -> if tok == s           then return s else mzero
 
 zeroOrMore :: Parser String -> Parser String
-zeroOrMore p = oneOrMore p <|> return ""
+zeroOrMore p = oneOrMore p <|> return "" -- XXX
 
 oneOrMore :: Parser a -> Parser a
 oneOrMore p = do
