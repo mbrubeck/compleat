@@ -1,69 +1,49 @@
-import Control.Monad (mzero, mplus)
+import Control.Monad (MonadPlus, mzero, mplus)
 import Data.List (isPrefixOf)
-import Parser
+import Parser (tokenize)
 
 -- Example
 
-git :: Completer
-git = str "git" --> rpt gitOptions --> gitCommand
+git :: Completer [String]
+git = str "git" --> gitOptions --> gitCommand
 
-gitOptions :: Completer
+gitOptions :: Completer [String]
 gitOptions = str "--version" <|> str "--help" <|> str "--work-tree"
 
-gitCommand :: Completer
-gitCommand = (str "add" --> rpt (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" --> rpt (str "-m" <|> str "-a" <|> str "--amend"))
+gitCommand :: Completer [String]
+gitCommand = (str "add" --> (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" --> (str "-m" <|> str "-a" <|> str "--amend"))
 
 -- Completers
 
-type Completer = Parser [String]
+data Completer a = Completer { complete :: ([String] -> [(a, [String])]) }
 
-complete :: Completer -> String -> [String]
-complete p s = concat $ map fst $ parse (apply p) s
+run :: Completer [a] -> String -> [a]
+run c s = concat $ map fst $ complete c (tokenize s)
 
-(-->) :: Parser a -> Parser a -> Parser a
-p --> q = do
-    a <- p
-    inp <- getInput
-    case inp of
-        "" -> return a
-        _  -> q
+instance Monad Completer where
+    return a  = Completer (\ts -> [(a, ts)])
+    c >>= f   = Completer (\ts -> concat [complete (f a) ts' | (a, ts') <- complete c ts])
 
-rpt :: Parser a -> Parser a
-rpt p = foldr1 (-->) (repeat p)
+instance MonadPlus Completer where
+    mzero     = Completer (\_  -> [])
+    mplus c d = Completer (\ts -> complete c ts ++ complete d ts)
 
-str :: String -> Completer
-str s = do
-    tok <- token
-    inp <- getInput
-    case inp of
-        "" -> if tok `isPrefixOf` s then return [s] else return []
-        _  -> if tok == s           then return [s] else mzero
+(<|>) :: Completer a -> Completer a -> Completer a
+(<|>) = mplus
 
--- Tokenize
+getInput :: Completer [String]
+getInput = Completer (\ts -> [(ts, ts)])
 
-apply :: Parser a -> Parser a
-apply p = spaces >> p
+(-->) :: Completer a -> Completer a -> Completer a
+c --> d = do
+    a <- c
+    ts <- getInput
+    case ts of [] -> return a
+               _  -> d
 
-token :: Parser String
-token = do
-    result <- quotedToken '"' +++ quotedToken '\'' +++ unquotedToken
-    spaces
-    return result
-
-unquotedToken :: Parser String
-unquotedToken = many1 (escaped +++ nonspace)
-
-quotedToken :: Char -> Parser String
-quotedToken q = bracket (char q) (many nonQuoteChar) (char q +++ return '_')
-    where nonQuoteChar = escaped +++ sat (q/=)
-
-escaped :: Parser Char
-escaped = do
-    char '\\'
-    c <- item
-    case c of
-        't' -> return '\t'
-        'n' -> return '\n'
-        'r' -> return '\r'
-        _   -> return c
+str :: String -> Completer [String]
+str s = Completer (\ts -> case ts of
+                            []     -> []
+                            [t]    -> if t `isPrefixOf` s then [([s],[])] else []
+                            (t:ts) -> if t == s           then [([s],ts)] else [])

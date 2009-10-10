@@ -1,10 +1,12 @@
 module Parser
-    ( Parser, parse, getInput, setInput
+    ( Parser, parse, run
+    , getInput, setInput
     , (<|>), (+++)
     , item, sat, char, string
     , spaces, nonspace
     , many, many1
     , bracket
+    , token, tokens, tokenize
     ) where
 
 import Control.Monad (MonadPlus, mzero, mplus, guard)
@@ -12,12 +14,15 @@ import Data.Char (isSpace)
 
 data Parser a = Parser { parse :: (String -> [(a, String)]) }
 
+run :: Parser a -> String -> [a]
+run p s = map fst $ parse p s
+
 instance Monad Parser where
     return a  = Parser (\cs -> [(a, cs)])
     p >>= f   = Parser (\cs -> concat [parse (f a) cs' | (a, cs') <- parse p cs])
 
 instance MonadPlus Parser where
-    mzero     = Parser (\cs -> [])
+    mzero     = Parser (\_  -> [])
     mplus p q = Parser (\cs -> parse p cs ++ parse q cs)
 
 (<|>) :: Parser a -> Parser a -> Parser a
@@ -79,3 +84,37 @@ bracket start middle end = do
     result <- middle
     end
     return result
+
+-- Tokenize
+
+tokenize :: String -> [String]
+tokenize s = head (run tokens s)
+
+tokens :: Parser [String]
+tokens = apply (many token)
+
+apply :: Parser a -> Parser a
+apply p = spaces >> p
+
+token :: Parser String
+token = do
+    result <- quotedToken '"' +++ quotedToken '\'' +++ unquotedToken
+    spaces
+    return result
+
+unquotedToken :: Parser String
+unquotedToken = many1 (escaped +++ nonspace)
+
+quotedToken :: Char -> Parser String
+quotedToken q = bracket (char q) (many nonQuoteChar) (char q +++ return '_')
+    where nonQuoteChar = escaped +++ sat (q/=)
+
+escaped :: Parser Char
+escaped = do
+    char '\\'
+    c <- item
+    case c of
+        't' -> return '\t'
+        'n' -> return '\n'
+        'r' -> return '\r'
+        _   -> return c
