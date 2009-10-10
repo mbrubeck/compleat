@@ -1,15 +1,10 @@
 module Parser
-    ( Parser,
-      parse,
-      (+++),
-      item,
-      sat,
-      char,
-      spaces,
-      nonspace,
-      many,
-      many1,
-      bracket
+    ( Parser, parse
+    , (+++)
+    , item, sat, char
+    , spaces, nonspace
+    , many, many1
+    , bracket
     ) where
 
 import Control.Monad (MonadPlus, mzero, mplus)
