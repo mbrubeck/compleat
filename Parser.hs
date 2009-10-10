@@ -1,9 +1,9 @@
 module Parser
     ( Parser, parse, getInput
     , (<|>), (+++)
-    , item, sat, char
+    , item, sat, char, string
     , spaces, nonspace
-    , many, many1, many'
+    , many, many1
     , bracket
     ) where
 
@@ -67,17 +67,6 @@ many1 p = do
     a <- p
     as <- many p
     return (a:as)
-
-split :: Parser [a] -> Parser a
-split p = Parser (\cs -> [(a,cs') | (as, cs') <- parse p cs,
-                                    not (null as),
-                                    let a = last as])
-
-many' :: Parser a -> Parser a
-many' p = split $ many1 p `mplus` return []
-
-many1' :: Parser a -> Parser a
-many1' = split . many1
 
 -- Expressions
 

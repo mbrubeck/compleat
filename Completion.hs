@@ -5,16 +5,14 @@ import Parser
 -- Example
 
 git :: Completer
-git = str "git" --> many' gitOptions --> gitCommand
+git = str "git" --> gitOptions --> gitCommand
 
 gitOptions :: Completer
-gitOptions = str "--version"
-         <|> str "--help"
-         <|> str "--work-tree"
+gitOptions = str "--version" <|> str "--help" <|> str "--work-tree"
 
 gitCommand :: Completer
-gitCommand = (str "add" --> many' (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" --> many' (str "-m" <|> str "-a" <|> str "--amend"))
+gitCommand = (str "add" --> (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" --> (str "-m" <|> str "-a" <|> str "--amend"))
 
 -- Completers
 
