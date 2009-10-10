@@ -44,4 +44,11 @@ token :: Parser String
 token = many1 escapedChar
 
 escapedChar :: Parser Char
-escapedChar = sat (const True) -- TODO
+escapedChar = do
+    char '\\'
+    c <- item
+    case c of
+        't' -> return '\t'
+        'n' -> return '\n'
+        'r' -> return '\r'
+        _   -> return c
