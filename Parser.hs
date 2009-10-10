@@ -1,5 +1,5 @@
 module Parser
-    ( Parser, parse
+    ( Parser, parse, getInput
     , (+++)
     , item, sat, char
     , spaces, nonspace
@@ -24,6 +24,9 @@ instance MonadPlus Parser where
 p +++ q = Parser (\cs -> case parse (p `mplus` q) cs of
                             []     -> []
                             (x:xs) -> [x])
+
+getInput :: Parser String
+getInput = Parser (\cs -> [(cs, cs)])
 
 -- Characters
 
