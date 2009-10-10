@@ -47,6 +47,10 @@ sat p = do
 char :: Char -> Parser Char
 char c = sat (c==)
 
+string :: String -> Parser String
+string ""     = return ""
+string (x:xs) = char x >> string xs >> return (x:xs)
+
 spaces :: Parser String
 spaces = many (sat isSpace)
 
