@@ -4,23 +4,24 @@ import Parser
 
 -- Example
 
-git :: Parser String
-git = str "git" --> zeroOrMore gitOptions --> gitCommand
+git :: Completer
+git = str "git" --> many' gitOptions --> gitCommand
 
-gitOptions :: Parser String
+gitOptions :: Completer
 gitOptions = str "--version"
          <|> str "--help"
-         <|> str "--work-tree" >> token
-         <|> return ""
+         <|> str "--work-tree"
 
-gitCommand :: Parser String
-gitCommand = (str "add" --> zeroOrMore (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" --> zeroOrMore (str "-m" >> token <|> str "-a" <|> str "--amend"))
+gitCommand :: Completer
+gitCommand = (str "add" --> many' (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" --> many' (str "-m" <|> str "-a" <|> str "--amend"))
 
 -- Completers
 
-complete :: Parser String -> String -> [String]
-complete p s = map fst $ parse (apply p) s
+type Completer = Parser [String]
+
+complete :: Completer -> String -> [String]
+complete p s = concat $ map fst $ parse (apply p) s
 
 (-->) :: Parser a -> Parser a -> Parser a
 p --> q = do
@@ -30,30 +31,13 @@ p --> q = do
         "" -> return a
         _  -> q
 
-str :: String -> Parser String
+str :: String -> Completer
 str s = do
     tok <- token
     inp <- getInput
     case inp of
-        "" -> if tok `isPrefixOf` s then return s else mzero
-        _  -> if tok == s           then return s else mzero
-
-zeroOrMore :: Parser a -> Parser a
-zeroOrMore p = do
-    inp <- getInput
-    let result = parse p inp
-    case result of
-        [] -> mzero
-        _  -> oneOrMore p
-
-oneOrMore :: Parser a -> Parser a
-oneOrMore p = do
-    first <- p
-    inp <- getInput
-    let result = parse p inp
-    case result of
-        [] -> return first
-        _  -> oneOrMore p
+        "" -> if tok `isPrefixOf` s then return [s] else return []
+        _  -> if tok == s           then return [s] else mzero
 
 -- Tokenize
 
