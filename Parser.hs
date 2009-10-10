@@ -1,6 +1,6 @@
 module Parser
     ( Parser, parse, getInput
-    , (+++)
+    , (<|>), (+++)
     , item, sat, char
     , spaces, nonspace
     , many, many1
@@ -19,6 +19,9 @@ instance Monad Parser where
 instance MonadPlus Parser where
     mzero     = Parser (\cs -> [])
     mplus p q = Parser (\cs -> parse p cs ++ parse q cs)
+
+(<|>) :: Parser a -> Parser a -> Parser a
+(<|>) = mplus
 
 (+++) :: Parser a -> Parser a -> Parser a
 p +++ q = Parser (\cs -> case parse (p `mplus` q) cs of

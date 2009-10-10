@@ -2,10 +2,39 @@ import Control.Monad (mzero, mplus)
 import Data.List (isPrefixOf)
 import Parser
 
-complete :: String -> Parser String
-complete s = do
+-- Example
+
+git :: Parser String
+git = str "git" >> zeroOrMore gitOptions >> gitCommand
+
+gitOptions :: Parser String
+gitOptions = str "--version"
+         <|> str "--help"
+         <|> str "--work-tree" >> token
+         <|> return ""
+
+gitCommand :: Parser String
+gitCommand = (str "add" >> zeroOrMore (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" >> zeroOrMore (str "-m" >> token <|> str "-a" <|> str "--amend"))
+
+-- Completers
+
+complete :: Parser String -> String -> [String]
+complete p s = map fst $ parse (apply p) s
+
+str :: String -> Parser String
+str s = do
     tok <- token
-    if tok `isPrefixOf` s then return s else mzero
+    inp <- getInput
+    case inp of
+        "" -> if tok `isPrefixOf` s then return s else mzero
+        _  -> if tok == s           then return s else mzero
+
+zeroOrMore :: Parser String -> Parser String
+zeroOrMore p = oneOrMore p <|> return ""
+    
+oneOrMore :: Parser String -> Parser String
+oneOrMore p = p >> zeroOrMore p
 
 -- Tokenize
 
