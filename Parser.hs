@@ -1,5 +1,5 @@
 module Parser
-    ( Parser, parse, getInput
+    ( Parser, parse, getInput, setInput
     , (<|>), (+++)
     , item, sat, char, string
     , spaces, nonspace
@@ -30,6 +30,9 @@ p +++ q = Parser (\cs -> case parse (p `mplus` q) cs of
 
 getInput :: Parser String
 getInput = Parser (\cs -> [(cs, cs)])
+
+setInput :: String -> Parser String
+setInput inp = Parser (\cs -> [(cs, inp)])
 
 -- Characters
 
