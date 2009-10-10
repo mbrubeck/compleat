@@ -5,14 +5,14 @@ import Parser
 -- Example
 
 git :: Completer
-git = str "git" --> gitOptions --> gitCommand
+git = str "git" --> rpt gitOptions --> gitCommand
 
 gitOptions :: Completer
 gitOptions = str "--version" <|> str "--help" <|> str "--work-tree"
 
 gitCommand :: Completer
-gitCommand = (str "add" --> (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" --> (str "-m" <|> str "-a" <|> str "--amend"))
+gitCommand = (str "add" --> rpt (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" --> rpt (str "-m" <|> str "-a" <|> str "--amend"))
 
 -- Completers
 
@@ -29,8 +29,8 @@ p --> q = do
         "" -> return a
         _  -> q
 
-rpt :: Completer -> Completer
-rpt p = (p --> p --> p --> p --> p)
+rpt :: Parser a -> Parser a
+rpt p = foldr1 (-->) (repeat p)
 
 str :: String -> Completer
 str s = do
