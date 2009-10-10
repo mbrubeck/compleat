@@ -29,6 +29,9 @@ p --> q = do
         "" -> return a
         _  -> q
 
+rpt :: Completer -> Completer
+rpt p = (p --> p --> p --> p --> p)
+
 str :: String -> Completer
 str s = do
     tok <- token
