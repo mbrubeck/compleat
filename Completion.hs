@@ -1,7 +1,11 @@
-import Parser
+import Control.Monad (mzero, mplus)
 import Data.List (isPrefixOf)
+import Parser
 
-
+complete :: String -> Parser String
+complete s = do
+    tok <- token
+    if tok `isPrefixOf` s then return s else mzero
 
 -- Tokenize
 
