@@ -32,9 +32,15 @@ str s = do
 
 zeroOrMore :: Parser String -> Parser String
 zeroOrMore p = oneOrMore p <|> return ""
-    
-oneOrMore :: Parser String -> Parser String
-oneOrMore p = p >> zeroOrMore p
+
+oneOrMore :: Parser a -> Parser a
+oneOrMore p = do
+    first <- p
+    inp <- getInput
+    let result = parse p inp
+    case result of
+        [] -> return first
+        _  -> oneOrMore p
 
 -- Tokenize
 
