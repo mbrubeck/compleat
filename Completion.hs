@@ -5,7 +5,10 @@ import Parser
 -- Example
 
 git :: Parser String
-git = str "git" >> zeroOrMore gitOptions >> gitCommand
+git = do
+    str "git"
+    zeroOrMore gitOptions
+    gitCommand
 
 gitOptions :: Parser String
 gitOptions = str "--version"
