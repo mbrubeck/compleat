@@ -7,7 +7,7 @@ module Parser
     , bracket
     ) where
 
-import Control.Monad (MonadPlus, mzero, mplus)
+import Control.Monad (MonadPlus, mzero, mplus, guard)
 import Data.Char (isSpace)
 
 data Parser a = Parser { parse :: (String -> [(a, String)]) }
@@ -41,7 +41,8 @@ item = Parser (\cs -> case cs of
 sat :: (Char -> Bool) -> Parser Char
 sat p = do 
     x <- item
-    if p x then return x else mzero
+    guard (p x)
+    return x
 
 char :: Char -> Parser Char
 char c = sat (c==)
