@@ -1,4 +1,5 @@
 import Control.Monad (MonadPlus, mzero, mplus)
+import Data.Char (isSpace)
 -- import Data.List (isPrefixOf)
 
 data Parser a = Parser { parse :: (String -> [(a, String)]) }
@@ -16,6 +17,8 @@ p +++ q = Parser (\cs -> case parse (p `mplus` q) cs of
                             []     -> []
                             (x:xs) -> [x])
 
+-- Characters
+
 item :: Parser Char
 item = Parser (\cs -> case cs of
                         ""     -> []
@@ -29,6 +32,14 @@ sat p = do
 char :: Char -> Parser Char
 char c = sat (c==)
 
+spaces :: Parser String
+spaces = many (sat isSpace)
+
+nonspace :: Parser Char
+nonspace = sat (not . isSpace)
+
+-- Repetition
+
 many :: Parser a -> Parser [a]
 many p = many1 p +++ return []
 
@@ -40,8 +51,17 @@ many1 p = do
 
 -- Bash-specific stuff
 
+tokens :: Parser [String]
+tokens = many token
+
 token :: Parser String
-token = many1 escapedChar
+token = spaces >> many1 tokenChar
+
+tokenChar :: Parser Char
+tokenChar = escapedChar +++ nonspace
+
+bashChar :: Parser Char
+bashChar = escapedChar +++ item
 
 escapedChar :: Parser Char
 escapedChar = do
