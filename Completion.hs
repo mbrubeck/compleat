@@ -38,8 +38,13 @@ str s = do
         "" -> if tok `isPrefixOf` s then return s else mzero
         _  -> if tok == s           then return s else mzero
 
-zeroOrMore :: Parser String -> Parser String
-zeroOrMore p = oneOrMore p <|> return "" -- XXX
+zeroOrMore :: Parser a -> Parser a
+zeroOrMore p = do
+    inp <- getInput
+    let result = parse p inp
+    case result of
+        [] -> mzero
+        _  -> oneOrMore p
 
 oneOrMore :: Parser a -> Parser a
 oneOrMore p = do
