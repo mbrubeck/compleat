@@ -49,22 +49,30 @@ many1 p = do
     as <- many p
     return (a:as)
 
+bracket :: Parser a -> Parser b -> Parser c -> Parser b
+bracket start middle end = do
+    start
+    result <- middle
+    end
+    return result
+
 -- Bash-specific stuff
 
 tokens :: Parser [String]
 tokens = many token
 
 token :: Parser String
-token = spaces >> many1 tokenChar
+token = spaces >> (quotedToken '"' +++ quotedToken '\'' +++ unquotedToken)
 
-tokenChar :: Parser Char
-tokenChar = escapedChar +++ nonspace
+unquotedToken :: Parser String
+unquotedToken = many1 (escaped +++ nonspace)
 
-bashChar :: Parser Char
-bashChar = escapedChar +++ item
+quotedToken :: Char -> Parser String
+quotedToken q = bracket (char q) (many nonQuoteChar) (char q)
+    where nonQuoteChar = escaped +++ sat (q/=)
 
-escapedChar :: Parser Char
-escapedChar = do
+escaped :: Parser Char
+escaped = do
     char '\\'
     c <- item
     case c of
