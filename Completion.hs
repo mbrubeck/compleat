@@ -5,14 +5,14 @@ import Parser (tokenize)
 -- Example
 
 git :: Completer [String]
-git = str "git" --> gitOptions --> gitCommand
+git = str "git" --> many gitOptions --> gitCommand
 
 gitOptions :: Completer [String]
 gitOptions = str "--version" <|> str "--help" <|> str "--work-tree"
 
 gitCommand :: Completer [String]
-gitCommand = (str "add" --> (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" --> (str "-m" <|> str "-a" <|> str "--amend"))
+gitCommand = (str "add" --> many (str "-i" <|> str "-n" <|> str "-v"))
+         <|> (str "commit" --> many (str "-m" <|> str "-a" <|> str "--amend"))
 
 -- Completers
 
@@ -41,6 +41,15 @@ c --> d = do
     ts <- getInput
     case ts of [] -> return a
                _  -> d
+
+many :: Completer [a] -> Completer [a]
+many c = many1 c <|> return []
+
+many1 :: Completer [a] -> Completer [a]
+many1 c = do
+    a <- c
+    as <- many c
+    return (a ++ as)
 
 str :: String -> Completer [String]
 str s = Completer (\ts -> case ts of
