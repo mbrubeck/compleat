@@ -19,7 +19,7 @@ gitCommand = (str "add" --> many (str "-i" <|> str "-n" <|> str "-v"))
 data Completer a = Completer { complete :: ([String] -> [(a, [String])]) }
 
 run :: Completer [a] -> String -> [a]
-run c s = concat $ map fst $ complete c (tokenize s)
+run c s = concat $ map fst $ filter (null . snd) $ complete c (tokenize s)
 
 instance Monad Completer where
     return a  = Completer (\ts -> [(a, ts)])
@@ -49,7 +49,7 @@ many1 :: Completer [a] -> Completer [a]
 many1 c = do
     a <- c
     as <- many c
-    return (a ++ as)
+    return $ [last (a ++ as)]
 
 str :: String -> Completer [String]
 str s = Completer (\ts -> case ts of
