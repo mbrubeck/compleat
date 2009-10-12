@@ -1,6 +1,12 @@
 data Completion = Tokens [String] | Suggestions [String]
 type Completer = [String] -> [Completion]
 
+(-->) :: Completer -> Completer -> Completer
+c --> d = \ts -> concat [ case result of
+                            Tokens ts' -> d ts'
+                            _          -> [result]
+                        | result <- c ts]
+
 str :: String -> Completer
 str s = match (s ==) (const $ Suggestions [s])
 
