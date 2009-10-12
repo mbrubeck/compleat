@@ -50,4 +50,4 @@ many :: Completer -> Completer
 many p = many1 p <|> continue
 
 many1 :: Completer -> Completer
-many1 p = p --> (many p <|> continue)
+many1 p = p --> many p
