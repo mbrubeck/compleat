@@ -1,6 +1,9 @@
 data Completion = Tokens [String] | Suggestions [String]
 type Completer = [String] -> [Completion]
 
+(<|>) :: Completer -> Completer -> Completer
+c <|> d = \ts -> c ts ++ d ts
+
 (-->) :: Completer -> Completer -> Completer
 c --> d = \ts -> concat [ case result of
                             Tokens ts' -> d ts'
