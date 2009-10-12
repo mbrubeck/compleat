@@ -21,8 +21,8 @@ type Completer = [String] -> [Completion]
 run :: Completer -> String -> [String]
 run c s = [s | Suggestions xs <- c (tokenize s), s <- xs]
 
-skip :: Completer
-skip ts = [Tokens ts]
+continue :: Completer
+continue ts = [Tokens ts]
 
 (<|>) :: Completer -> Completer -> Completer
 c <|> d = \ts -> c ts ++ d ts
@@ -42,12 +42,12 @@ match :: (String -> Bool) -> (String -> Completion) -> Completer
 match p suggest ts = case ts of
     []     -> []
     [t]    -> [suggest t]
-    (t:ts) -> if p t then [Tokens ts] else []
+    (t:ts) -> if p t then continue ts else []
 
 -- Repetition
 
 many :: Completer -> Completer
-many p = many1 p <|> skip
+many p = many1 p <|> continue
 
 many1 :: Completer -> Completer
-many1 p = p --> (many p <|> skip)
+many1 p = p --> (many p <|> continue)
