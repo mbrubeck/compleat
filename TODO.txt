@@ -1,6 +1,7 @@
-Port tokenizer to Parsec.
 Finish usage parser.
   Load usage from a file.
   Easy way to install new usage files.
 Short/long option completers.
   Should consume unknown options, but suggest only known ones.
+Port tokenizer to Parsec.
+More examples.

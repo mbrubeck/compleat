@@ -1,7 +1,7 @@
 module Usage () where
 
-import Text.Parsec.Char (char, noneOf, string)
-import Text.Parsec.Combinator (anyToken, option)
+import Text.Parsec.Char (char, noneOf, string, spaces)
+import Text.Parsec.Combinator (anyToken, option, between)
 import Text.Parsec.Prim ((<|>), many)
 import Text.Parsec.String (Parser)
 import qualified Completer as C
@@ -16,27 +16,24 @@ term :: Parser C.Completer
 term = str <|> group <|> optionGroup
 
 group :: Parser C.Completer
-group = do
-    char '('
-    c <- terms 
-    char ')'
-    return c
+group = between (char '(') (char ')') terms
 
 optionGroup :: Parser C.Completer
-optionGroup = do
-    char '['
-    c <- terms 
-    char ']'
-    return (c C.<|> C.continue)
+optionGroup = between (char '[') (char ']') terms
 
 str :: Parser C.Completer
 str = do
-    char '"'
-    s <- many (noneOf "\"")
-    char '"'
-    return (C.str s)
+    p <- between (char '"') (char '"') (many $ noneOf "\"")
+    return (C.str p)
+
+token :: Parser a -> Parser a
+token p = do
+    result <- p
+    spaces
+    return result
 
 -- Lexer?
+
 
 lexer :: T.TokenParser ()
 lexer  = T.makeTokenParser haskellStyle
