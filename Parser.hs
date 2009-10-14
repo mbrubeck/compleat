@@ -3,7 +3,7 @@ module Parser
     , getInput, setInput
     , (<|>), (+++)
     , item, sat, char, string
-    , spaces, nonspace
+    , space, nonspace
     , many, many1
     , bracket
     , token, tokens, tokenize
@@ -39,6 +39,11 @@ getInput = Parser (\cs -> [(cs, cs)])
 setInput :: String -> Parser String
 setInput inp = Parser (\cs -> [(cs, inp)])
 
+eof :: Parser ()
+eof = Parser (\cs -> case cs of
+                        [] -> [((), cs)]
+                        _  -> [])
+
 -- Characters
 
 item :: Parser Char
@@ -59,8 +64,8 @@ string :: String -> Parser String
 string ""     = return ""
 string (x:xs) = char x >> string xs >> return (x:xs)
 
-spaces :: Parser String
-spaces = many (sat isSpace)
+space :: Parser Char
+space = sat isSpace
 
 nonspace :: Parser Char
 nonspace = sat (not . isSpace)
@@ -94,13 +99,11 @@ tokens :: Parser [String]
 tokens = apply (many token)
 
 apply :: Parser a -> Parser a
-apply p = spaces >> p
+apply p = p
 
 token :: Parser String
-token = do
-    result <- quotedToken '"' +++ quotedToken '\'' +++ unquotedToken
-    spaces
-    return result
+token = (many space >> (quotedToken '"' +++ quotedToken '\'' +++ unquotedToken))
+    <|> (many1 space >> eof >> return "")
 
 unquotedToken :: Parser String
 unquotedToken = many1 (escaped +++ nonspace)
