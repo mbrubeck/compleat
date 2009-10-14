@@ -5,6 +5,7 @@ module Completer
     , (<|>), (-->)
     , str, match
     , many, many1
+    , git
     ) where
 
 import Data.List (isPrefixOf)
