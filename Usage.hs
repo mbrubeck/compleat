@@ -9,41 +9,39 @@ import qualified Text.Parsec.Token as T
 import Text.Parsec.Language (haskellStyle)
 
 terms :: Parser C.Completer
-terms = many term >>=
-    \cs -> return (foldl (C.-->) C.continue cs)
+terms = do
+    cs <- many term
+    return (foldl (C.-->) C.continue cs)
 
 term :: Parser C.Completer
-term = str <|> group <|> optionGroup
+term = group <|> optionGroup <|> str
 
 group :: Parser C.Completer
-group = between (char '(') (char ')') terms
+group = parens terms
 
 optionGroup :: Parser C.Completer
-optionGroup = between (char '[') (char ']') terms
+optionGroup = do
+    c <- brackets terms
+    return (c C.<|> C.continue)
 
 str :: Parser C.Completer
 str = do
-    p <- between (char '"') (char '"') (many $ noneOf "\"")
-    return (C.str p)
-
-token :: Parser a -> Parser a
-token p = do
-    result <- p
-    spaces
-    return result
+    s <- stringLiteral <|> identifier
+    return (C.str s)
 
 -- Lexer?
-
 
 lexer :: T.TokenParser ()
 lexer  = T.makeTokenParser haskellStyle
 
-whiteSpace = T.whiteSpace lexer
-lexeme     = T.lexeme lexer
-symbol     = T.symbol lexer
-natural    = T.natural lexer
-parens     = T.parens lexer
-semi       = T.semi lexer
-identifier = T.identifier lexer
-reserved   = T.reserved lexer
-reservedOp = T.reservedOp lexer
+whiteSpace    = T.whiteSpace lexer
+lexeme        = T.lexeme lexer
+symbol        = T.symbol lexer
+natural       = T.natural lexer
+parens        = T.parens lexer
+brackets      = T.parens lexer
+semi          = T.semi lexer
+identifier    = T.identifier lexer
+reserved      = T.reserved lexer
+reservedOp    = T.reservedOp lexer
+stringLiteral = T.stringLiteral lexer
