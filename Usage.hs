@@ -1,8 +1,7 @@
 module Usage () where
 
-import Text.Parsec.Char (char, noneOf, string, spaces)
-import Text.Parsec.Combinator (anyToken, option, between)
-import Text.Parsec.Prim ((<|>), many)
+import Text.Parsec.Combinator (anyToken, chainl1)
+import Text.Parsec.Prim ((<|>), many, try, runParser)
 import Text.Parsec.String (Parser)
 import qualified Completer as C
 import qualified Text.Parsec.Token as T
@@ -14,26 +13,28 @@ terms = do
     return (foldl (C.-->) C.continue cs)
 
 term :: Parser C.Completer
-term = group <|> optionGroup <|> str
+term = repeater
+
+atom :: Parser C.Completer
+atom = group <|> optionGroup <|> str
 
 repeater = do
-    c <- term
-    symbol "..."
-    return (C.many1 c)
+    c <- atom
+    try (symbol "..." >> return (C.many1 c)) <|> return c
 
-choice = do
-    c <- term
-    symbol "|"
-    d <- term
-    return (c C.<|> d)
+choice :: Parser C.Completer
+choice = chainl1 term (symbol "|" >> return (C.<|>))
 
 group :: Parser C.Completer
-group = parens terms
+group = parens item
 
 optionGroup :: Parser C.Completer
 optionGroup = do
-    c <- brackets terms
+    c <- brackets item
     return (c C.<|> C.continue)
+
+item :: Parser C.Completer
+item = try terms <|> choice
 
 str :: Parser C.Completer
 str = do
