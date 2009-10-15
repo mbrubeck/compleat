@@ -13,14 +13,8 @@ terms = do
     return (foldl (C.-->) C.continue cs)
 
 term :: Parser C.Completer
-term = repeater
-
-atom :: Parser C.Completer
-atom = group <|> optionGroup <|> str
-
-repeater = do
-    c <- atom
-    try (symbol "..." >> return (C.many1 c)) <|> return c
+term = repeated (group <|> str) C.many1 id
+   <|> repeated optionGroup C.many C.optional
 
 choice :: Parser C.Completer
 choice = chainl1 term (symbol "|" >> return (C.<|>))
@@ -29,9 +23,12 @@ group :: Parser C.Completer
 group = parens item
 
 optionGroup :: Parser C.Completer
-optionGroup = do
-    c <- brackets item
-    return (c C.<|> C.continue)
+optionGroup = brackets item
+
+repeated :: Parser a -> (a -> b) -> (a -> b) -> Parser b
+repeated p f g = do
+    c <- p
+    try (symbol "..." >> return (f c)) <|> return (g c)
 
 item :: Parser C.Completer
 item = try terms <|> choice
