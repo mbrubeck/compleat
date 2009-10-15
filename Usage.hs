@@ -1,34 +1,44 @@
 module Usage () where
 
-import Text.Parsec.Combinator (anyToken, chainl1)
+import Text.Parsec.Char (alphaNum, oneOf)
+import Text.Parsec.Combinator (anyToken, chainl1, many1)
 import Text.Parsec.Prim ((<|>), many, try, runParser)
 import Text.Parsec.String (Parser)
 import qualified Completer as C
 import qualified Text.Parsec.Token as T
 import Text.Parsec.Language (javaStyle)
 
+-- Example
+
+git :: C.Completer
+git = run terms "git [-a|-b] ...  ( add [-i|-m|--amend] | commit -b )"
+
+run :: Parser a -> String -> a
+run p s = case runParser p () "" s of
+            Right a -> a
+            Left err -> error (show err)
+
+-- Grammar
+
 terms :: Parser C.Completer
 terms = do
     cs <- many term
     return (foldl (C.-->) C.continue cs)
 
-term = repeated (choiceGroup <|> str) C.many1 id
+term = repeated (group <|> str) C.many1 id
    <|> repeated optionGroup C.many C.optional
 
-optionGroup = do
-    c <- brackets (try choice <|> terms)
-    return c
-
-choiceGroup = parens choice
+group = parens (try choice <|> terms)
+optionGroup = brackets (try choice <|> terms)
 
 choice = do
-    c <- term
+    c <- terms
     symbol "|"
-    d <- (try choice <|> term)
+    d <- (try choice <|> terms)
     return (c C.<|> d)
 
 str = do
-    s <- stringLiteral <|> identifier
+    s <- stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,"))
     return (C.str s)
 
 repeated :: Parser a -> (a -> b) -> (a -> b) -> Parser b
@@ -44,11 +54,6 @@ lexer  = T.makeTokenParser javaStyle
 whiteSpace    = T.whiteSpace lexer
 lexeme        = T.lexeme lexer
 symbol        = T.symbol lexer
-natural       = T.natural lexer
 parens        = T.parens lexer
 brackets      = T.brackets lexer
-semi          = T.semi lexer
-identifier    = T.identifier lexer
-reserved      = T.reserved lexer
-reservedOp    = T.reservedOp lexer
 stringLiteral = T.stringLiteral lexer
