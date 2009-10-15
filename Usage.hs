@@ -16,6 +16,17 @@ terms = do
 term :: Parser C.Completer
 term = group <|> optionGroup <|> str
 
+repeater = do
+    c <- term
+    symbol "..."
+    return (C.many1 c)
+
+choice = do
+    c <- term
+    symbol "|"
+    d <- term
+    return (c C.<|> d)
+
 group :: Parser C.Completer
 group = parens terms
 
