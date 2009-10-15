@@ -1,7 +1,7 @@
 module Completer
     ( Completer
     , run
-    , continue, optional
+    , continue, optional, skip
     , (<|>), (-->)
     , str, match
     , many, many1
@@ -21,6 +21,10 @@ run c s = [s | Suggestions xs <- c (tokenize s), s <- xs]
 
 continue :: Completer
 continue ts = [Tokens ts]
+
+skip :: Completer
+skip (t:ts) = [Tokens ts]
+skip _      = []
 
 optional :: Completer -> Completer
 optional c = c <|> continue

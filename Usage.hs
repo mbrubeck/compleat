@@ -1,7 +1,7 @@
 module Usage () where
 
-import Text.Parsec.Char (alphaNum, oneOf)
-import Text.Parsec.Combinator (anyToken, chainl1, many1)
+import Text.Parsec.Char (alphaNum, char, oneOf)
+import Text.Parsec.Combinator (anyToken, between, chainl1, many1)
 import Text.Parsec.Prim ((<|>), many, try, runParser)
 import Text.Parsec.String (Parser)
 import qualified Completer as C
@@ -11,7 +11,7 @@ import Text.Parsec.Language (javaStyle)
 -- Example
 
 git :: C.Completer
-git = run terms "git [-a|-b] ...  ( add [-i|-m|--amend] | commit -b )"
+git = run terms "git [-a|-b] ...  ( add [-i|--amend] ... | commit [-b|-m <msg>] ... )"
 
 run :: Parser a -> String -> a
 run p s = case runParser p () "" s of
@@ -27,6 +27,7 @@ terms = do
 
 term = repeated (group <|> str) C.many1 id
    <|> repeated optionGroup C.many C.optional
+   <|> variable
 
 group = parens (try choice <|> terms)
 optionGroup = brackets (try choice <|> terms)
@@ -46,6 +47,8 @@ repeated p f g = do
     c <- p
     try (symbol "..." >> return (f c)) <|> return (g c)
 
+variable = between (char '<') (char '>') identifier >> return C.skip
+
 -- Lexer
 
 lexer :: T.TokenParser ()
@@ -54,6 +57,7 @@ lexer  = T.makeTokenParser javaStyle
 whiteSpace    = T.whiteSpace lexer
 lexeme        = T.lexeme lexer
 symbol        = T.symbol lexer
+identifier    = T.identifier lexer
 parens        = T.parens lexer
 brackets      = T.brackets lexer
 stringLiteral = T.stringLiteral lexer
