@@ -15,8 +15,9 @@ unquoted :: Parser String
 unquoted = manyTill (escaped <|> anyChar) (try space)
 
 quoted :: Char -> Parser String
-quoted q = between (char q) (char q <|> return '_') (many nonQuote)
-    where nonQuoteChar = escaped <|> noneOf [q]
+quoted q = do
+    char q
+    manyTill (escaped <|> anyChar) (try (char q) <|> (eof >> return '_'))
 
 escaped :: Parser Char
 escaped = do
