@@ -1,9 +1,13 @@
-module Tokenize () where
+module Tokenize (tokenize, tokens, token) where
 
-import Text.Parsec.Char (anyChar, char, noneOf, space, spaces)
-import Text.Parsec.Combinator (between, eof, many1, manyTill, option)
-import Text.Parsec.Prim ((<|>), many, try, runParser)
+import Data.Char (isSpace)
+import Text.Parsec hiding (token, tokens)
 import Text.Parsec.String (Parser)
+
+tokenize :: String -> [String]
+tokenize s = case runParser tokens () "" s of
+                Right ts -> ts
+                Left  _  -> []
 
 tokens :: Parser [String]
 tokens = do
@@ -19,7 +23,7 @@ quoted q = do
     manyTill (escaped <|> anyChar) (try (char q >> return ()) <|> eof)
 
 unquoted :: Parser String
-unquoted = many1 (escaped <|> noneOf " ")
+unquoted = many1 (escaped <|> satisfy (not . isSpace))
 
 escaped :: Parser Char
 escaped = do

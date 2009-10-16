@@ -11,7 +11,7 @@ import Text.Parsec.Language (javaStyle)
 -- Example
 
 git :: C.Completer
-git = run terms "git [-a|-b] ...  ( add [-i|--amend] ... | commit [-b|-m <msg>] ... )"
+git = run choice "git [-a|-b] ...  ( add [-i|--amend] ... | commit [-b|-m <msg>] ... )"
 
 run :: Parser a -> String -> a
 run p s = case runParser p () "" s of
@@ -19,6 +19,8 @@ run p s = case runParser p () "" s of
             Left err -> error (show err)
 
 -- Grammar
+
+choice = chainl1 terms (symbol "|" >> return (C.<|>))
 
 terms :: Parser C.Completer
 terms = do
@@ -31,8 +33,6 @@ term = repeated (group <|> str) C.many1 id
 
 group = parens choice
 optionGroup = brackets choice
-
-choice = chainl1 terms (symbol "|" >> return (C.<|>))
 
 str = do
     s <- stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,"))

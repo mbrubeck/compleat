@@ -1,15 +1,13 @@
 module Completer
-    ( Completer
-    , run
+    ( Completer, run
     , continue, optional, skip
     , (<|>), (-->)
-    , str, match
+    , str
     , many, many1
-    , git
     ) where
 
 import Data.List (isPrefixOf)
-import Parser (tokenize)
+import Tokenize (tokenize)
 
 -- Primitives
 
@@ -56,15 +54,3 @@ many p = many1 p <|> continue
 
 many1 :: Completer -> Completer
 many1 p = p --> many p
-
--- Example
-
-git :: Completer
-git = str "git" --> many gitOptions --> gitCommand
-
-gitOptions :: Completer
-gitOptions = str "--version" <|> str "--help" <|> str "--work-tree"
-
-gitCommand :: Completer
-gitCommand = (str "add" --> many (str "-i" <|> str "-n" <|> str "-v"))
-         <|> (str "commit" --> many (str "-m" <|> str "-a" <|> str "--amend"))
