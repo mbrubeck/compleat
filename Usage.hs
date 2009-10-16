@@ -1,4 +1,4 @@
-module Usage () where
+module Usage (usage) where
 
 import Text.Parsec.Char (alphaNum, char, oneOf)
 import Text.Parsec.Combinator (anyToken, between, chainl1, many1)
@@ -10,19 +10,16 @@ import Text.Parsec.Language (javaStyle)
 
 -- Example
 
-git :: C.Completer
-git = run choice "git [-a|-b] ...  ( add [-i|--amend] ... | commit [-b|-m <msg>] ... )"
-
-run :: Parser a -> String -> a
-run p s = case runParser p () "" s of
+usage :: String -> C.Completer
+usage s = case runParser choice () "" s of
             Right a -> a
             Left err -> error (show err)
 
 -- Grammar
 
+choice :: Parser C.Completer
 choice = chainl1 terms (symbol "|" >> return (C.<|>))
 
-terms :: Parser C.Completer
 terms = do
     cs <- many term
     return (foldl (C.-->) C.continue cs)

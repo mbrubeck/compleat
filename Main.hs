@@ -1,5 +1,10 @@
 import System.Posix.Env (getEnv)
-import Completer (run, git)
+import Completer (Completer, run)
+import Usage (usage)
+
+git :: Completer
+git = usage $ "git [-a|-b] ...  ( add [-i|--amend] ... | commit [-b|-m <msg>] ... ) "
+         ++ "| git foo bar baz"
 
 main :: IO ()
 main = do
