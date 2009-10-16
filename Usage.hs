@@ -29,14 +29,10 @@ term = repeated (group <|> str) C.many1 id
    <|> repeated optionGroup C.many C.optional
    <|> variable
 
-group = parens (try choice <|> terms)
-optionGroup = brackets (try choice <|> terms)
+group = parens choice
+optionGroup = brackets choice
 
-choice = do
-    c <- terms
-    symbol "|"
-    d <- (try choice <|> terms)
-    return (c C.<|> d)
+choice = chainl1 terms (symbol "|" >> return (C.<|>))
 
 str = do
     s <- stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,"))
@@ -47,7 +43,9 @@ repeated p f g = do
     c <- p
     try (symbol "..." >> return (f c)) <|> return (g c)
 
-variable = between (char '<') (char '>') identifier >> return C.skip
+variable = do
+    between (char '<') (char '>') identifier
+    return C.skip
 
 -- Lexer
 
