@@ -54,7 +54,6 @@ variable = between (char '<') (char '>') identifier >> return C.skip
 lexer :: T.TokenParser ()
 lexer  = T.makeTokenParser javaStyle
 
-whiteSpace    = T.whiteSpace lexer
 lexeme        = T.lexeme lexer
 symbol        = T.symbol lexer
 identifier    = T.identifier lexer
