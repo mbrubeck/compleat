@@ -1,12 +1,15 @@
 module Tokenize () where
 
 import Text.Parsec.Char (anyChar, char, noneOf, space, spaces)
-import Text.Parsec.Combinator (between, eof, many1, manyTill)
+import Text.Parsec.Combinator (between, eof, many1, manyTill, option)
 import Text.Parsec.Prim ((<|>), many, try, runParser)
 import Text.Parsec.String (Parser)
 
 tokens :: Parser [String]
-tokens = many token
+tokens = do
+    ts <- many (try token)
+    last <- option [] (many1 space >> return [""])
+    return (ts ++ last)
 
 token = spaces >> (quoted '"' <|> quoted '\'' <|> unquoted)
 
@@ -16,10 +19,7 @@ quoted q = do
     manyTill (escaped <|> anyChar) (try (char q >> return ()) <|> eof)
 
 unquoted :: Parser String
-unquoted = do
-    c <- anyChar
-    cs <- manyTill (escaped <|> anyChar) (try (space >> return ()) <|> eof)
-    return (c:cs)
+unquoted = many1 (escaped <|> noneOf " ")
 
 escaped :: Parser Char
 escaped = do
