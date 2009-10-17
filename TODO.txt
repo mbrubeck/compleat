@@ -1,7 +1,8 @@
-Finish usage parser.
-  Load usage from a file.
-  Easy way to install new usage files.
-Short/long option completers.
-  Should consume unknown options, but suggest only known ones.
-Port tokenizer to Parsec.
+Easy way to install new usage files into the shell.
+Document the usage file format.
+Named sub-rules in usage files.
+Completers that perform IO (e.g. suggest matching filenames).
+Generic completer for short/long --options.
+Setup/install scripts using Cabal.
+Support non-bash shells.
 More examples.
