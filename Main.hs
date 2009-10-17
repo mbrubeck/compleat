@@ -1,12 +1,18 @@
-import System.Posix.Env (getEnv)
-import Completer (Completer, run)
-import Usage (usage)
+import Completer (run)
+import Numeric (readDec)
+import System (getArgs)
+import System.Environment (getEnv)
+import Usage (fromFile)
 
-git :: Completer
-git = usage $ "git [-a|-b] ...  ( add [-i|--amend] ... | commit [-b|-m <msg>] ... ) "
-         ++ "| git foo bar baz"
-
-main :: IO ()
 main = do
-    Just line <- getEnv "COMP_LINE"
-    mapM_ putStrLn (run git line)
+    args <- getArgs
+    completer <- fromFile (head args)
+    line <- getInput
+    mapM_ putStrLn (run completer line)
+
+getInput :: IO String
+getInput = do
+    line  <- getEnv "COMP_LINE"
+    point <- getEnv "COMP_POINT"
+    let [(n,[])] = readDec point
+    return (take n line)

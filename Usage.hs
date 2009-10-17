@@ -1,24 +1,20 @@
-module Usage (usage) where
+module Usage (fromFile) where
 
-import Text.Parsec.Char (alphaNum, char, oneOf)
-import Text.Parsec.Combinator (anyToken, between, chainl1, many1)
-import Text.Parsec.Prim ((<|>), many, try, runParser)
-import Text.Parsec.String (Parser)
 import qualified Completer as C
-import qualified Text.Parsec.Token as T
+import Text.Parsec
 import Text.Parsec.Language (javaStyle)
+import Text.Parsec.String (Parser, parseFromFile)
+import qualified Text.Parsec.Token as T
 
--- Example
+fromFile :: String -> IO C.Completer
+fromFile fileName = do
+    result <- parseFromFile usage fileName
+    case result of
+        Right c  -> return c
+        Left err -> error (show err)
 
-usage :: String -> C.Completer
-usage s = case runParser choice () "" s of
-            Right a -> a
-            Left err -> error (show err)
-
--- Grammar
-
-choice :: Parser C.Completer
-choice = chainl1 terms (symbol "|" >> return (C.<|>))
+usage :: Parser C.Completer
+usage = chainl1 terms (symbol "|" >> return (C.<|>))
 
 terms = do
     cs <- many term
@@ -28,8 +24,8 @@ term = repeated (group <|> str) C.many1 id
    <|> repeated optionGroup C.many C.optional
    <|> variable
 
-group = parens choice
-optionGroup = brackets choice
+group = parens usage
+optionGroup = brackets usage
 
 str = do
     s <- stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,"))
