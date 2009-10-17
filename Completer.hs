@@ -5,36 +5,14 @@ module Completer
     , str
     , many, many1
     ) where
-
 import Data.List (isPrefixOf)
 import Tokenize (tokenize)
 
--- Primitives
-
-data Completion = Tokens [String] | Suggestions [String]
 type Completer = [String] -> [Completion]
+data Completion = Tokens [String] | Suggestions [String]
 
 run :: Completer -> String -> [String]
 run c s = [s | Suggestions xs <- c (tokenize s), s <- xs]
-
-continue :: Completer
-continue ts = [Tokens ts]
-
-skip :: Completer
-skip (t:ts) = [Tokens ts]
-skip _      = []
-
-optional :: Completer -> Completer
-optional c = c <|> continue
-
-(<|>) :: Completer -> Completer -> Completer
-c <|> d = \ts -> c ts ++ d ts
-
-(-->) :: Completer -> Completer -> Completer
-c --> d = \ts -> concat [ case result of
-                            Tokens ts' -> d ts'
-                            _          -> [result]
-                        | result <- c ts]
 
 -- Matching
 
@@ -47,7 +25,28 @@ match p suggest ts = case ts of
     [t]    -> [suggest t]
     (t:ts) -> if p t then continue ts else []
 
--- Repetition
+-- Primitives
+
+continue :: Completer
+continue ts = [Tokens ts]
+
+skip :: Completer
+skip (t:ts) = [Tokens ts]
+skip _      = []
+
+-- Combinators
+
+optional :: Completer -> Completer
+optional c = c <|> continue
+
+(<|>) :: Completer -> Completer -> Completer
+c <|> d = \ts -> c ts ++ d ts
+
+(-->) :: Completer -> Completer -> Completer
+c --> d = \ts -> concat [ case result of
+                            Tokens ts' -> d ts'
+                            _          -> [result]
+                        | result <- c ts]
 
 many :: Completer -> Completer
 many p = many1 p <|> continue
