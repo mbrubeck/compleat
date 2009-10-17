@@ -14,18 +14,19 @@ fromFile fileName = do
         Left err -> error (show err)
 
 usage :: Parser C.Completer
-usage = chainl1 terms (symbol "|" >> return (C.<|>))
+usage = whiteSpace >> set
+
+set = chainl1 terms (symbol "|" >> return (C.<|>))
 
 terms = do
     cs <- many term
     return (foldl (C.-->) C.continue cs)
 
-term = repeated (group <|> str) C.many1 id
+term = repeated (group <|> str <|> variable) C.many1 id
    <|> repeated optionGroup C.many C.optional
-   <|> variable
 
-group = parens usage
-optionGroup = brackets usage
+group = parens set
+optionGroup = brackets set
 
 str = do
     s <- stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,"))
@@ -36,9 +37,9 @@ repeated p f g = do
     c <- p
     try (symbol "..." >> return (f c)) <|> return (g c)
 
-variable = do
+variable = lexeme (do
     between (char '<') (char '>') identifier
-    return C.skip
+    return C.skip)
 
 -- Lexer
 
@@ -51,3 +52,4 @@ identifier    = T.identifier lexer
 parens        = T.parens lexer
 brackets      = T.brackets lexer
 stringLiteral = T.stringLiteral lexer
+whiteSpace    = T.whiteSpace lexer

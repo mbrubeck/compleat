@@ -5,9 +5,9 @@ import System.Environment (getEnv)
 import Usage (fromFile)
 
 main = do
+    line <- getInput
     args <- getArgs
     completer <- fromFile (head args)
-    line <- getInput
     mapM_ putStrLn (run completer line)
 
 getInput :: IO String
