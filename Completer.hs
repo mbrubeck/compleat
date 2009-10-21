@@ -5,24 +5,25 @@ module Completer
     , str
     , many, many1
     ) where
+import Control.Monad (sequence)
 import Data.List (isPrefixOf)
 import Tokenize (tokenize)
 
 type Completer = [String] -> [Completion]
-data Completion = Tokens [String] | Suggestions [String]
+data Completion = Tokens [String] | Suggestions [IO String]
 
-run :: Completer -> String -> [String]
-run c s = [s | Suggestions xs <- c (tokenize s), s <- xs]
+run :: Completer -> String -> IO [String]
+run c s = sequence [s | Suggestions xs <- c (tokenize s), s <- xs]
 
 -- Matching
 
 str :: String -> Completer
-str s = match (s ==) (\t -> Suggestions $ filter (t `isPrefixOf`) [s])
+str s = match (s ==) (\t -> if t `isPrefixOf` s then [return s] else [])
 
-match :: (String -> Bool) -> (String -> Completion) -> Completer
+match :: (String -> Bool) -> (String -> [IO String]) -> Completer
 match p suggest ts = case ts of
     []     -> []
-    [t]    -> [suggest t]
+    [t]    -> [Suggestions $ suggest t]
     (t:ts) -> if p t then continue ts else []
 
 -- Primitives

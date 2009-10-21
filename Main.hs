@@ -8,7 +8,8 @@ main = do
     line <- getInput
     args <- getArgs
     completer <- fromFile (head args)
-    mapM_ putStrLn (run completer line)
+    suggestions <- run completer line
+    mapM_ putStrLn suggestions
 
 getInput :: IO String
 getInput = do
