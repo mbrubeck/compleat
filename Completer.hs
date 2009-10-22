@@ -2,25 +2,29 @@ module Completer
     ( Completer, run
     , continue, optional, skip
     , (<|>), (-->)
-    , str
+    , str, file
     , many, many1
     ) where
-import Control.Monad (sequence)
+import Control.Monad (liftM, sequence)
 import Data.List (isPrefixOf)
 import Tokenize (tokenize)
+import System.Directory (getDirectoryContents)
 
 type Completer = [String] -> [Completion]
-data Completion = Tokens [String] | Suggestions [IO String]
+data Completion = Tokens [String] | Suggestions (IO [String])
 
 run :: Completer -> String -> IO [String]
-run c s = sequence [s | Suggestions xs <- c (tokenize s), s <- xs]
+run c s = liftM concat $ sequence [x | Suggestions x <- c (tokenize s)]
 
 -- Matching
 
 str :: String -> Completer
-str s = match (s ==) (\t -> if t `isPrefixOf` s then [return s] else [])
+str s = match (s ==) (\t -> if t `isPrefixOf` s then return [s] else return [])
 
-match :: (String -> Bool) -> (String -> [IO String]) -> Completer
+file :: Completer
+file = match (const True) (\t -> liftM (filter (t `isPrefixOf`)) (getDirectoryContents "."))
+
+match :: (String -> Bool) -> (String -> IO [String]) -> Completer
 match p suggest ts = case ts of
     []     -> []
     [t]    -> [Suggestions $ suggest t]

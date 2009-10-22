@@ -37,9 +37,9 @@ repeated p f g = do
     c <- p
     try (symbol "..." >> return (f c)) <|> return (g c)
 
-variable = lexeme (do
-    between (char '<') (char '>') identifier
-    return C.skip)
+variable = lexeme $ do
+    id <- between (char '<') (char '>') identifier
+    return (if id == "file" then C.file else C.skip)
 
 -- Lexer
 
