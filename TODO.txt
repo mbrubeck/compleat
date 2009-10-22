@@ -1,8 +1,16 @@
-Easy way to install new usage files into the shell.
-Document the usage file format.
-Named sub-rules in usage files.
-Completers that perform IO (e.g. suggest matching filenames).
-Generic completer for short/long --options.
-Setup/install scripts using Cabal.
-Support non-bash shells.
-More examples.
+Support:
+  Easy way to install new usage files into the shell.
+  Document the usage file format.
+  Setup/install scripts using Cabal.
+  Support non-bash shells.
+  More examples.
+Changes to usage format:
+  Separate top-level "statements" in usage files (with semicolons?).
+  Special handling of first token (command name) in a usage statement.
+  Way to register builtin and user-defined "variables" (named sub-parsers).
+  Embedded shell commands (with ! prefix?) to generate completions.
+  Try using an embedded DSL instead of the usage parser?
+Built-in completers:
+  Better filename completer (or just use "complete -o default"?).
+  Generic completer for short/long --options.
+  Easy way to define new Haskell completers.
