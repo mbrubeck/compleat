@@ -22,7 +22,7 @@ Instructions
 2. Build the main program: `ghc --make Main`
 
 3. Try out the example completer: `complete -C "$PWD/Main examples/top.usage"
-   top`
+   -o nospace top`
 
 4. Type `top` and press "tab" to see the results.
 

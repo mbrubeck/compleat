@@ -19,7 +19,7 @@ run c s = liftM concat $ sequence [x | Suggestions x <- c (tokenize s)]
 -- Matching
 
 str :: String -> Completer
-str s = match (s ==) (\t -> if t `isPrefixOf` s then return [s] else return [])
+str s = match (s ==) (\t -> if t `isPrefixOf` s then return [s ++ " "] else return [])
 
 file :: Completer
 file = match (const True) (\t -> liftM (filter (t `isPrefixOf`)) (getDirectoryContents "."))
