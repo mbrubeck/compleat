@@ -7,14 +7,13 @@ module Completer
     ) where
 import Control.Monad (liftM, sequence)
 import Data.List (isPrefixOf)
-import Tokenize (tokenize)
 import System.Directory (getDirectoryContents)
 
 type Completer = [String] -> [Completion]
 data Completion = Tokens [String] | Suggestions (IO [String])
 
-run :: Completer -> String -> IO [String]
-run c s = liftM concat $ sequence [x | Suggestions x <- c (tokenize s)]
+run :: Completer -> [String] -> IO [String]
+run c ts = liftM concat $ sequence [x | Suggestions x <- c ts]
 
 -- Matching
 
