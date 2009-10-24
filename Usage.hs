@@ -16,7 +16,8 @@ fromFile fileName = do
 usage :: Parser C.Completer
 usage = do
     whiteSpace
-    chainl1 (command <|> (eof >> return C.continue)) (symbol ";" >> return (C.<|>))
+    cs <- sepEndBy1 command (symbol ";")
+    return $ foldl1 (C.<|>) cs
 
 command = do
     c <- commandName 

@@ -8,4 +8,4 @@ android [--silent|--verbose]
   | update project ((--target|--name) <val> | --path <file>) ...
   | update adb );
 
-android --help
+android --help;
