@@ -14,14 +14,16 @@ fromFile fileName = do
         Left err -> error (show err)
 
 usage :: Parser C.Completer
-usage = whiteSpace >> chainl1 command (symbol ";" >> return (C.<|>))
+usage = do
+    whiteSpace
+    chainl1 (command <|> (eof >> return C.continue)) (symbol ";" >> return (C.<|>))
 
 command = do
     c <- commandName 
     s <- set
     return (c C.--> s)
 
-commandName = identifier >> return C.skip
+commandName = atom >> return C.skip
 
 set = chainl1 terms (symbol "|" >> return (C.<|>))
 
@@ -35,9 +37,7 @@ term = repeated (group <|> str <|> variable) C.many1 id
 group = parens set
 optionGroup = brackets set
 
-str = do
-    s <- stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,"))
-    return (C.str s)
+str = atom >>= \s -> return (C.str s)
 
 repeated :: Parser a -> (a -> b) -> (a -> b) -> Parser b
 repeated p f g = do
@@ -45,8 +45,10 @@ repeated p f g = do
     try (symbol "..." >> return (f c)) <|> return (g c)
 
 variable = do
-    id <- between (symbol "<") (symbol ">") identifier
+    id <- between (symbol "<") (symbol ">") atom
     return (if id == "file" then C.file else C.skip)
+
+atom = stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,:"))
 
 -- Lexer
 
@@ -55,7 +57,6 @@ lexer  = T.makeTokenParser javaStyle
 
 lexeme        = T.lexeme lexer
 symbol        = T.symbol lexer
-identifier    = T.identifier lexer
 parens        = T.parens lexer
 brackets      = T.brackets lexer
 stringLiteral = T.stringLiteral lexer

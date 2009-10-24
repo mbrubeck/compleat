@@ -28,6 +28,36 @@ Instructions
 
 [1]: http://hackage.haskell.org/platform/
 
+Syntax
+======
+
+A usage file contains one or more *commands*, separated by semicolons.
+
+A command consists of a *command name* followed by a *pattern*.  The command name
+can be any valid atom.
+
+An *atom* consists of letters, numbers, and any of the characters `-_/@=+.,:`,
+or any characters enclosed in double quotes with C/Java-style backslash escapes.
+
+The following are valid patterns:
+
+* `foo` matches the string "foo".
+* `a b` matches `a` followed by `b`.
+* `a b | c` matches either `a b` or `c`.
+* `[a]` matches zero or more occurrences of `a`.
+* `a ...` matches one or more occurrences of `a`.
+* `[a] ...` matches zero or more occurrences of `a`.
+
+Patterns may also include *variables*:
+
+* `<var>` is a pattern that matches anything.  (Use any atom in place of "var".)
+* `<file>` is a special variable that will offer filenames as completions.
+
+Use parentheses to group patterns:
+
+* `a (b | c)` matches `a` followed by either `b` or `c`.
+* `(a | b) ...` matches one or more occurrences of `a` and `b`. 
+
 Copyright
 =========
 
