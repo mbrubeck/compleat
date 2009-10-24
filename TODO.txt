@@ -1,6 +1,5 @@
 Support:
   Easy way to install new usage files into the shell.
-  Document the usage file format.
   Setup/install scripts using Cabal.
   Support non-bash shells.
   More examples.

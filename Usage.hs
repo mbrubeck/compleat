@@ -20,12 +20,12 @@ usage = do
 
 command = do
     c <- commandName 
-    s <- set
+    s <- pattern
     return (c C.--> s)
 
 commandName = atom >> return C.skip
 
-set = chainl1 terms (symbol "|" >> return (C.<|>))
+pattern = chainl1 terms (symbol "|" >> return (C.<|>))
 
 terms = do
     cs <- many term
@@ -34,8 +34,8 @@ terms = do
 term = repeated (group <|> str <|> variable) C.many1 id
    <|> repeated optionGroup C.many C.optional
 
-group = parens set
-optionGroup = brackets set
+group = parens pattern
+optionGroup = brackets pattern
 
 str = atom >>= \s -> return (C.str s)
 
