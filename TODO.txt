@@ -5,8 +5,6 @@ Support:
   Support non-bash shells.
   More examples.
 Changes to usage format:
-  Separate top-level "statements" in usage files (with semicolons?).
-  Special handling of first token (command name) in a usage statement.
   Way to register builtin and user-defined "variables" (named sub-parsers).
   Embedded shell commands (with ! prefix?) to generate completions.
   Try using an embedded DSL instead of the usage parser?

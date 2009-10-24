@@ -14,7 +14,14 @@ fromFile fileName = do
         Left err -> error (show err)
 
 usage :: Parser C.Completer
-usage = whiteSpace >> set
+usage = whiteSpace >> chainl1 command (symbol ";" >> return (C.<|>))
+
+command = do
+    c <- commandName 
+    s <- set
+    return (c C.--> s)
+
+commandName = identifier >> return C.skip
 
 set = chainl1 terms (symbol "|" >> return (C.<|>))
 

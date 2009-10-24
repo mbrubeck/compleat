@@ -6,6 +6,6 @@ android [--silent|--verbose]
   | (delete|update) avd --name <name>
   | create project ((--package|--name|--activity|--target) <val> | --path <file>) ...
   | update project ((--target|--name) <val> | --path <file>) ...
-  | update adb )
-|
+  | update adb );
+
 android --help

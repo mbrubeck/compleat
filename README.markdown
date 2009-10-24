@@ -5,8 +5,8 @@ Use Compleat to add command-line completion for any program by specifying its
 usage in a familiar manpage-like format.  For example, a usage specification
 for `top(1)`:
 
-      top [-b | -c | -H | -i | -s | -S | -d <delay> | -n <num> | -p <pid> ...] ...
-    | top (-h|-v)
+    top [-b | -c | -H | -i | -s | -S | -d <delay> | -n <num> | -p <pid> ...] ... ;
+    top (-h|-v)
 
 Compleat is a work in progress, and is not yet fully usable.  However, the
 core functionality is ready to try out.  The only supported shell at the
