@@ -6,49 +6,70 @@ import Text.Parsec.Language (javaStyle)
 import Text.Parsec.String (Parser, parseFromFile)
 import qualified Text.Parsec.Token as T
 
+data Usage = Primitive C.Completer | Var String
+             | Choice [Usage] | Sequence [Usage]
+             | Many Usage | Many1 Usage | Optional Usage
+
 fromFile :: String -> IO C.Completer
 fromFile fileName = do
     result <- parseFromFile usage fileName
     case result of
-        Right c  -> return c
+        Right u  -> return (eval u)
         Left err -> error (show err)
 
-usage :: Parser C.Completer
+-- Evaluator
+
+eval :: Usage -> C.Completer
+eval (Primitive c) = c
+eval (Var s)       = if s == "file" then C.file else C.skip
+eval (Choice xs)   = foldl1 (C.<|>) (map eval xs)
+eval (Sequence xs) = foldl1 (C.-->) (map eval xs)
+eval (Many x)      = C.many     (eval x)
+eval (Many1 x)     = C.many1    (eval x)
+eval (Optional x)  = C.optional (eval x)
+
+-- Parser
+
+usage :: Parser Usage
 usage = do
     whiteSpace
-    cs <- sepEndBy1 command (symbol ";")
-    return $ foldl1 (C.<|>) cs
+    xs <- sepEndBy1 command (symbol ";")
+    return (Choice xs)
 
 command = do
-    c <- commandName 
-    s <- pattern
-    return (c C.--> s)
+    x <- commandName 
+    y <- pattern
+    return (Sequence [x, y])
 
-commandName = atom >> return C.skip
+commandName = atom >> return (Primitive C.skip)
 
-pattern = chainl1 terms (symbol "|" >> return (C.<|>))
+pattern = do
+    xs <- sepBy1 terms (symbol "|")
+    return (Choice xs)
 
 terms = do
-    cs <- many term
-    return (foldl (C.-->) C.continue cs)
+    xs <- many1 term
+    return (Sequence xs)
 
-term = repeated (group <|> str <|> variable) C.many1 id
-   <|> repeated optionGroup C.many C.optional
+term = repeated (group <|> str <|> variable) Many1 id
+   <|> repeated optionGroup Many Optional
 
 group = parens pattern
 optionGroup = brackets pattern
 
-str = atom >>= \s -> return (C.str s)
+str = do
+    s <- atom
+    return $ Primitive (C.str s)
 
 repeated :: Parser a -> (a -> b) -> (a -> b) -> Parser b
-repeated p f g = do
-    c <- p
-    try (symbol "..." >> return (f c)) <|> return (g c)
+repeated p f g = p >>= \x ->
+    try (symbol "..." >> return (f x)) <|> return (g x)
 
 variable = do
-    id <- between (symbol "<") (symbol ">") atom
-    return (if id == "file" then C.file else C.skip)
+    s <- between (symbol "<") (symbol ">") atom
+    return (Var s)
 
+atom :: Parser String
 atom = stringLiteral <|> lexeme (many1 (alphaNum <|> oneOf "-_/@=+.,:"))
 
 -- Lexer
