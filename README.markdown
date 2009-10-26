@@ -1,16 +1,14 @@
 Compleat
 ========
 
-Use Compleat to add command-line completion for any program by specifying its
-usage in a familiar manpage-like format.  For example, a usage specification
-for `top(1)`:
+Generate tab completion for any shell command by specifying its usage in a
+familiar manpage-like format.  For example, a usage specification for
+`top(1)`:
 
     top [-b | -c | -H | -i | -s | -S | -d <delay> | -n <num> | -p <pid> ...] ... ;
     top (-h|-v)
 
-Compleat is a work in progress, and is not yet fully usable.  However, the
-core functionality is ready to try out.  The only supported shell at the
-moment is `bash`.
+The only supported shell at the moment is `bash`.
 
 Instructions
 ============
@@ -19,9 +17,9 @@ Instructions
    Platform][1].  Debian/Ubuntu users, run: `sudo aptitude install
    libghc6-parsec3-dev`
 
-2. Build the main program: `ghc --make Main`
+2. Build the main program: `ghc --make compleat`
 
-3. Try out the example completer: `complete -C "$PWD/Main examples/top.usage"
+3. Try out the example completer: `complete -C "$PWD/compleat examples/top.usage"
    -o nospace top`
 
 4. Type `top` and press "tab" to see the results.
