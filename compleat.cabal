@@ -1,0 +1,14 @@
+Name:                compleat
+Version:             0.0
+Description:         Generate command-line completions from simple usage descriptions.
+License:             MIT
+License-file:        LICENSE
+Author:              Matt Brubeck
+Maintainer:          mbrubeck@limpet.net
+Build-Type:          Simple
+Cabal-Version:       >=1.2
+Executable compleat
+  Main-is:           compleat.hs
+  Build-Depends:     base >= 3 && < 5,
+                     parsec >= 3,
+                     directory, haskell98

@@ -1,4 +1,5 @@
 *.o
 *.hi
 compleat
+dist
 README.html

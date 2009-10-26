@@ -1,6 +1,5 @@
 Support:
   Easy way to install new usage files into the shell.
-  Setup/install scripts using Cabal.
   Debian/Ubuntu packages.
   Support non-bash shells.
   More examples.
