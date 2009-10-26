@@ -32,7 +32,9 @@ eval env (Sequence xs) = foldl1 (C.-->) (map (eval env) xs)
 eval env (Many x)      = C.many     (eval env x)
 eval env (Many1 x)     = C.many1    (eval env x)
 eval env (Optional x)  = C.optional (eval env x)
-eval env (Var s)       = if s == "file" then C.file else C.skip
+eval env (Var s)       = case lookup s env of
+                            Just u  -> eval env u
+                            Nothing -> C.skip
 
 -- Top-level parser
 

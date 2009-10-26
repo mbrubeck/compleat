@@ -31,10 +31,11 @@ Instructions
 Syntax
 ======
 
-A usage file contains one or more *commands*, separated by semicolons.
+A usage file contains commands and definitions, separated by semicolons.
 
-A command consists of a *command name* followed by a *pattern*.  The command name
-can be any valid atom.
+A *command* consists of a *command name* followed by a *pattern*.  The command
+name can be any atom.  If there is more than one command in the file, compleat
+will attempt to match each of them against the input line.
 
 An *atom* consists of letters, numbers, and any of the characters `-_/@=+.,:`,
 or any string enclosed in double quotes with C/Java-style backslash escapes.
@@ -49,16 +50,18 @@ The following are valid patterns:
 * `a ...` matches one or more occurrences of `a`.
 * `[a] ...` matches zero or more occurrences of `a`.
 
-Patterns may also include *variables*:
-
-* `<var>` is a pattern that matches anything.  (Use any atom in place of "var".)
-* `<file>` is a special variable that will offer filenames as completions.
-
 Use parentheses to group patterns:
 
 * `a (b | c)` matches `a` followed by either `b` or `c`.
 * `(a | b) ...` matches `a` or `b` followed by any number of additional
   `a` or `b`.
+
+Patterns may also include *variables*:
+
+* `name = value;` defines a new variable.  The name can be any atom, and the
+  value can be any pattern.
+* `<name>` in a pattern will be replaced by the value of the `name` variable.
+  If no value is defined, `<name>` will match any word.
 
 Copyright
 =========

@@ -1,10 +1,10 @@
 Support:
   Easy way to install new usage files into the shell.
   Setup/install scripts using Cabal.
+  Debian/Ubuntu packages.
   Support non-bash shells.
   More examples.
 Changes to usage format:
-  Way to register builtin and user-defined "variables" (named sub-parsers).
   Embedded shell commands (with ! prefix?) to generate completions.
   Try using an embedded DSL instead of the usage parser?
 Built-in completers:

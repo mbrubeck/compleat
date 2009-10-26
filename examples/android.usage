@@ -1,4 +1,4 @@
-android [--silent|--verbose]
+android <options>
   ( list [avd|target]
   | create avd ( --target <name> | --name <name> | --skin <name> | --path <file>
                | --sdcard <file> | --force ) ...
@@ -9,3 +9,5 @@ android [--silent|--verbose]
   | update adb );
 
 android --help;
+
+options = [--silent | --verbose];
