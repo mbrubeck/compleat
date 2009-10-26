@@ -14,12 +14,16 @@ fromFile :: String -> IO C.Completer
 fromFile fileName = do
     result <- parseFromFile usage fileName
     case result of
-        Right env -> return (eval env $ mainCommand env)
+        Right env -> return (run env)
         Left err  -> error (show err)
 
 -- Evaluator
 
 type Environment = [(String,Usage)]
+
+run :: Environment -> C.Completer
+run env = eval env (main env)
+    where main env = Choice $ map snd $ filter ((""==) . fst) env
 
 eval :: Environment -> Usage -> C.Completer
 eval env (Primitive c) = c
@@ -29,9 +33,6 @@ eval env (Many x)      = C.many     (eval env x)
 eval env (Many1 x)     = C.many1    (eval env x)
 eval env (Optional x)  = C.optional (eval env x)
 eval env (Var s)       = if s == "file" then C.file else C.skip
-
-mainCommand :: Environment -> Usage
-mainCommand env = Choice $ map snd $ filter ((""==) . fst) env
 
 -- Top-level parser
 
