@@ -1,8 +1,7 @@
 module Tokenize (tokenize, tokens, token) where
 
 import Data.Char (isSpace)
-import Text.Parsec hiding (token, tokens)
-import Text.Parsec.String (Parser)
+import Text.ParserCombinators.Parsec hiding (token, tokens)
 
 tokenize :: String -> [String]
 tokenize s = case runParser tokens () "" s of

@@ -14,17 +14,19 @@ Instructions
 ============
 
 1. Install GHC and Parsec.  OS X or Windows users, download the [Haskell
-   Platform][1].  Debian/Ubuntu users, run: `sudo aptitude install
-   libghc6-parsec3-dev`
+   Platform][1].  (Mac OS X 10.6 may require a [workaround][2] for 64-bit
+   compatibility.) Debian/Ubuntu users, run: `sudo aptitude install
+   libghc6-parsec2-dev`
 
 2. Build the main program: `ghc --make compleat`
 
-3. Try out the example completer: `complete -C "$PWD/compleat examples/top.usage"
+3. Try out the example completer: `complete -C "$PWD/compleat $PWD/examples/top.usage"
    -o nospace top`
 
 4. Type `top` and press "tab" to see the results.
 
 [1]: http://hackage.haskell.org/platform/
+[2]: http://www.haskell.org/haskellwiki/Mac_OS_X
 
 Syntax
 ======

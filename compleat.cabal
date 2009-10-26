@@ -10,5 +10,5 @@ Cabal-Version:       >=1.2
 Executable compleat
   Main-is:           compleat.hs
   Build-Depends:     base >= 3 && < 5,
-                     parsec >= 3,
+                     parsec < 3,
                      directory, haskell98

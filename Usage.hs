@@ -1,10 +1,9 @@
 module Usage (fromFile) where
 
 import qualified Completer as C
-import Text.Parsec
-import Text.Parsec.Language (javaStyle)
-import Text.Parsec.String (Parser, parseFromFile)
-import qualified Text.Parsec.Token as T
+import Text.ParserCombinators.Parsec
+import Text.ParserCombinators.Parsec.Language (javaStyle)
+import qualified Text.ParserCombinators.Parsec.Token as T
 
 data Usage = Primitive C.Completer | Var String
              | Choice [Usage] | Sequence [Usage]
