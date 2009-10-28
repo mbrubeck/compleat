@@ -10,26 +10,46 @@ familiar manpage-like format.  For example, a usage specification for
 
 The only supported shell at the moment is `bash`.
 
-Instructions
-============
+Installation
+------------
 
-1. Install GHC and Parsec.  OS X or Windows users, download the [Haskell
-   Platform][1].  (Mac OS X 10.6 may require a [workaround][2] for 64-bit
-   compatibility.) Debian/Ubuntu users, run: `sudo aptitude install
-   libghc6-parsec2-dev`
-
-2. Build the main program: `ghc --make compleat`
-
-3. Try out the example completer: `complete -C "$PWD/compleat $PWD/examples/top.usage"
-   -o nospace top`
-
-4. Type `top` and press "tab" to see the results.
+First, install GHC and Parsec.  OS X or Windows users, download the [Haskell
+Platform][1].  (Mac OS X 10.6 may require a [workaround][2] for 64-bit
+compatibility.) Debian/Ubuntu users, run: `sudo aptitude install
+libghc6-parsec2-dev`
 
 [1]: http://hackage.haskell.org/platform/
 [2]: http://www.haskell.org/haskellwiki/Mac_OS_X
 
+To install Compleat in your system, run: 
+
+    ./Setup.lhs configure
+    ./Setup.lhs build
+    sudo ./Setup.lhs install
+
+(This will install to `/usr/local` by default.   The "configure" command takes
+a `--prefix=PATH` option to change the location, and `--user` to install as a
+non-root user.)
+
+To enable compleat in your shell, add the following line to your `.bashrc`.
+(Adjust the path if you configured with a custom prefix.)
+
+    source /usr/local/share/compleat-1.0/compleat_setup
+
+and install your usage files in a directory named `/etc/compleat.d` or `~/.compleat`:
+
+    sudo mkdir /etc/compleat.d
+    sudo cp examples/* /etc/compleat.d
+
+Restart your shell to begin using completions:
+
+    exec bash
+
+Type `top ` or `android ` and then press Tab a few times to see the example
+files in action.
+
 Syntax
-======
+------
 
 A usage file contains commands and definitions, separated by semicolons.
 
@@ -64,7 +84,7 @@ Patterns may also include *variables*:
   If no value is defined, `<name>` will match any word.
 
 Copyright
-=========
+---------
 
 Copyright (c) 2009 Matt Brubeck
 
