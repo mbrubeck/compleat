@@ -4,8 +4,9 @@
 for DIR in $COMPLEAT_SYSTEM_DIR $COMPLEAT_USER_DIR; do
     if [ -d $DIR -a -r $DIR -a -x $DIR ]; then
         for FILE in $DIR/*.usage; do
-            COMMAND=`basename $FILE .usage`
-            complete -o nospace -o default -C "compleat $FILE" $COMMAND
+            for COMMAND in `compleat $FILE`; do
+                complete -o nospace -o default -C "compleat $FILE" $COMMAND
+            done
         done
     fi
 done

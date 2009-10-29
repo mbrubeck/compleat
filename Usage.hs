@@ -1,6 +1,7 @@
-module Usage (fromFile) where
+module Usage (Environment, commands, fromFile, lookupCommand) where
 
 import qualified Completer as C
+import Data.List (nub, sort)
 import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Language (javaStyle)
 import qualified Text.ParserCombinators.Parsec.Token as T
@@ -12,11 +13,11 @@ data Usage = Primitive C.Completer | Var String
              | Choice [Usage] | Sequence [Usage]
              | Many Usage | Many1 Usage | Optional Usage
 
-fromFile :: String -> String -> IO C.Completer
-fromFile fileName command = do
+fromFile :: String -> IO Environment
+fromFile fileName = do
     result <- parseFromFile usage fileName
     case result of
-        Right env -> return (run env command)
+        Right env -> return env
         Left err  -> error (show err)
 
 -- Evaluator
@@ -25,8 +26,8 @@ type Environment = [(EnvName,Usage)] -- Associates variables with values.
 data EnvName = VarName String | CommandName String
     deriving Eq
 
-run :: Environment -> String -> C.Completer
-run env command = eval env (main env)
+lookupCommand :: Environment -> String -> C.Completer
+lookupCommand env command = eval env (main env)
     where main env = Choice $ map snd $ filter ((CommandName command ==) . fst) env
 
 eval :: Environment -> Usage -> C.Completer
@@ -39,6 +40,9 @@ eval env (Optional x)  = C.optional (eval env x)
 eval env (Var s)       = case lookup (VarName s) env of
                             Just u  -> eval env u
                             Nothing -> C.skip
+
+commands :: Environment -> [String]
+commands env = nub $ sort [s | (CommandName s, _) <- env]
 
 -- Top-level parser
 
