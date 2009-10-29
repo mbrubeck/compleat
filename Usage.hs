@@ -12,20 +12,22 @@ data Usage = Primitive C.Completer | Var String
              | Choice [Usage] | Sequence [Usage]
              | Many Usage | Many1 Usage | Optional Usage
 
-fromFile :: String -> IO C.Completer
-fromFile fileName = do
+fromFile :: String -> String -> IO C.Completer
+fromFile fileName command = do
     result <- parseFromFile usage fileName
     case result of
-        Right env -> return (run env)
+        Right env -> return (run env command)
         Left err  -> error (show err)
 
 -- Evaluator
 
-type Environment = [(String,Usage)] -- Associates variables with values.
+type Environment = [(EnvName,Usage)] -- Associates variables with values.
+data EnvName = VarName String | CommandName String
+    deriving Eq
 
-run :: Environment -> C.Completer
-run env = eval env (main env)
-    where main env = Choice $ map snd $ filter ((""==) . fst) env
+run :: Environment -> String -> C.Completer
+run env command = eval env (main env)
+    where main env = Choice $ map snd $ filter ((CommandName command ==) . fst) env
 
 eval :: Environment -> Usage -> C.Completer
 eval env (Primitive c) = c
@@ -34,36 +36,29 @@ eval env (Sequence xs) = foldl1 (C.-->) (map (eval env) xs)
 eval env (Many x)      = C.many     (eval env x)
 eval env (Many1 x)     = C.many1    (eval env x)
 eval env (Optional x)  = C.optional (eval env x)
-eval env (Var s)       = case lookup s env of
+eval env (Var s)       = case lookup (VarName s) env of
                             Just u  -> eval env u
                             Nothing -> C.skip
 
 -- Top-level parser
 
-usage :: Parser [(String, Usage)]
-usage = whiteSpace >> sepEndBy1 (try definition <|> mainDefinition) (symbol ";")
+usage :: Parser Environment
+usage = whiteSpace >> sepEndBy1 (try varDef <|> commandDef) (symbol ";")
 
-definition :: Parser (String, Usage)
-definition = do
+varDef :: Parser (EnvName, Usage)
+varDef = do
     s <- atom
     symbol "="
     u <- pattern
-    return (s, u)
+    return (VarName s, u)
 
-mainDefinition :: Parser (String, Usage)
-mainDefinition = do
-    u <- command
-    return ("", u)
+commandDef :: Parser (EnvName, Usage)
+commandDef = do
+    s <- atom
+    u <- pattern
+    return (CommandName s, Sequence [Primitive C.skip, u])
 
 -- Usage parser
-
-command :: Parser Usage
-command = do
-    x <- commandName 
-    y <- pattern
-    return (Sequence [x, y])
-
-commandName = atom >> return (Primitive C.skip)
 
 pattern = do
     xs <- sepBy1 terms (symbol "|")

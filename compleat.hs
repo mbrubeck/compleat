@@ -8,7 +8,8 @@ import Usage (fromFile)
 main = do
     line <- getInput
     args <- getArgs
-    completer <- fromFile (head args)
+    let command = args !! 1
+    completer <- fromFile (head args) command
     suggestions <- run completer (tokenize line)
     mapM_ putStrLn suggestions
 
