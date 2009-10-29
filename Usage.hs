@@ -5,6 +5,9 @@ import Text.ParserCombinators.Parsec
 import Text.ParserCombinators.Parsec.Language (javaStyle)
 import qualified Text.ParserCombinators.Parsec.Token as T
 
+-- This module parses the usage file format (see README for an explanation)
+-- and generates a Completer (see the Completer module).
+
 data Usage = Primitive C.Completer | Var String
              | Choice [Usage] | Sequence [Usage]
              | Many Usage | Many1 Usage | Optional Usage
@@ -18,7 +21,7 @@ fromFile fileName = do
 
 -- Evaluator
 
-type Environment = [(String,Usage)]
+type Environment = [(String,Usage)] -- Associates variables with values.
 
 run :: Environment -> C.Completer
 run env = eval env (main env)

@@ -3,6 +3,12 @@ module Tokenize (tokenize, tokens, token) where
 import Data.Char (isSpace)
 import Text.ParserCombinators.Parsec hiding (token, tokens)
 
+-- | @tokenize@
+-- Split a shell command into a list of words, attempting to use the same
+-- rules as the shell (does not yet handle certain cases like subshells).
+-- The command might be incomplete, so handle unbalanced quotes, and treat
+-- trailing whitespace as the start of an empty token.
+
 tokenize :: String -> [String]
 tokenize s = case runParser tokens () "" s of
                 Right ts -> ts
