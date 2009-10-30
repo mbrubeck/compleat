@@ -13,7 +13,9 @@ The only supported shell at the moment is `bash`.
 Installation
 ------------
 
-First, install GHC and Parsec.  OS X or Windows users, download the [Haskell
+Get the source code: `git clone git://github.com/mbrubeck/compleat.git`
+
+Next, install GHC and Parsec.  OS X or Windows users, download the [Haskell
 Platform][1].  (Mac OS X 10.6 may require a [workaround][2] for 64-bit
 compatibility.) Debian/Ubuntu users, run: `sudo aptitude install
 libghc6-parsec2-dev`
@@ -36,7 +38,8 @@ To enable compleat in your shell, add the following line to your `.bashrc`.
 
     source /usr/local/share/compleat-1.0/compleat_setup
 
-and install your usage files in a directory named `/etc/compleat.d` or `~/.compleat`:
+and install your .usage files in a directory named `/etc/compleat.d` or
+`~/.compleat`:
 
     sudo mkdir /etc/compleat.d
     sudo cp examples/* /etc/compleat.d
