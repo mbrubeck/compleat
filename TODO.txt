@@ -1,12 +1,9 @@
 Support:
-  Easy way to install new usage files into the shell.
   Debian/Ubuntu packages.
   Support non-bash shells.
   More examples.
-Changes to usage format:
-  Embedded shell commands (with ! prefix?) to generate completions.
-  Try using an embedded DSL instead of the usage parser?
 Built-in completers:
   Better filename completer (or just use "complete -o default"?).
   Generic completer for short/long --options.
   Easy way to define new Haskell completers.
+    Maybe usage files should be compiled to Haskell or another language?

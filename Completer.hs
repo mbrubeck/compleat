@@ -2,12 +2,15 @@ module Completer
     ( Completer, run
     , continue, optional, skip
     , (<|>), (-->)
-    , str, file
+    , str, shellCommand
     , many, many1
     ) where
 import Control.Monad (liftM, sequence)
 import Data.List (isPrefixOf)
+import IO (hGetContents)
 import System.Directory (getDirectoryContents)
+import System.Posix.Env (setEnv)
+import System.Process (StdStream(CreatePipe), createProcess, proc, std_out)
 
 -- The "Completer" type is a function that takes a list of input tokens and
 -- returns a list of possible completions.  Each completion can be a new list
@@ -27,17 +30,25 @@ data Completion = Tokens [String] | Suggestions (IO [String])
 run :: Completer -> [String] -> IO [String]
 run c ts = liftM concat $ sequence [x | Suggestions x <- c ts]
 
+-- Shell commands
+
+shellCommand :: String -> Completer
+shellCommand command = match (const True) (\t -> do
+    setEnv "COMP_CWORD" t True
+    output <- getCommandOutput command
+    return $ matchesFrom (lines output) t)
+
+getCommandOutput :: String -> IO String
+getCommandOutput command = do
+    (_, Just hout, _, _) <- createProcess (proc "bash" ["-c", command])
+                                          {std_out = CreatePipe}
+    hGetContents hout
 
 -- Matching
 
 -- Match or suggest the specified string.
 str :: String -> Completer
-str s = match (s ==) (\t -> if t `isPrefixOf` s then return [s ++ " "] else return [])
-
--- Match anything, or suggest a list of matching files.
--- (This is not yet fully implemented - it only looks for files in the current directory.)
-file :: Completer
-file = match (const True) (\t -> liftM (filter (t `isPrefixOf`)) (getDirectoryContents "."))
+str s = match (s ==) (\t -> return $ matchesFrom [s] t)
 
 -- Build a completer that looks at a single token. If more input remains then call
 -- predicate "p" to decide whether to continue.  Otherwise, call fuction "suggest"
@@ -48,6 +59,9 @@ match p suggest ts = case ts of
     [t]    -> [Suggestions $ suggest t]
     (t:ts) -> if p t then continue ts else []
 
+-- Return words 
+matchesFrom :: [String] -> String -> [String]
+matchesFrom xs t = [x ++ " " | x <- xs, t `isPrefixOf` x]
 
 -- Other primitives
 

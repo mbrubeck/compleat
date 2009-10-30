@@ -45,8 +45,7 @@ Restart your shell to begin using completions:
 
     exec bash
 
-Type `top ` or `android ` and then press Tab a few times to see the example
-files in action.
+Type `top` and then press Tab a few times to see the example files in action.
 
 Syntax
 ------
@@ -78,10 +77,18 @@ Use parentheses to group patterns:
 
 Patterns may also include *variables*:
 
-* `name = value;` defines a new variable.  The name can be any atom, and the
-  value can be any pattern.
-* `<name>` in a pattern will be replaced by the value of the `name` variable.
-  If no value is defined, `<name>` will match any word.
+* `name = value;` defines a new variable.  The name can be any atom,
+  and the value can be any pattern.  Then `<name>` in a pattern refers to the
+  value as a sub-pattern.
+
+* `name = !command;` defines a variable that uses a shell command to
+  generate suggested completions.  The shell command should print one
+  suggested completion per line.  The `$COMP_LINE` and `$COMP_CWORD`
+  environment will contain the input line and the current word being
+  completed.
+
+* If no value is defined for `name`, then the pattern `<name>` will match any
+  word.
 
 Copyright
 ---------

@@ -12,6 +12,7 @@ import qualified Text.ParserCombinators.Parsec.Token as T
 data Usage = Primitive C.Completer | Var String
              | Choice [Usage] | Sequence [Usage]
              | Many Usage | Many1 Usage | Optional Usage
+             | ShellCommand String
 
 fromFile :: String -> IO Environment
 fromFile fileName = do
@@ -37,6 +38,7 @@ eval env (Sequence xs) = foldl1 (C.-->) (map (eval env) xs)
 eval env (Many x)      = C.many     (eval env x)
 eval env (Many1 x)     = C.many1    (eval env x)
 eval env (Optional x)  = C.optional (eval env x)
+eval env (ShellCommand s) = C.shellCommand s
 eval env (Var s)       = case lookup (VarName s) env of
                             Just u  -> eval env u
                             Nothing -> C.skip
@@ -53,7 +55,7 @@ varDef :: Parser (EnvName, Usage)
 varDef = do
     s <- atom
     symbol "="
-    u <- pattern
+    u <- shellCommand <|> pattern
     return (VarName s, u)
 
 commandDef :: Parser (EnvName, Usage)
@@ -63,6 +65,11 @@ commandDef = do
     return (CommandName s, Sequence [Primitive C.skip, u])
 
 -- Usage parser
+
+shellCommand = do
+    symbol "!"
+    s <- many1 (noneOf ";")
+    return (ShellCommand s)
 
 pattern = do
     xs <- sepBy1 terms (symbol "|")
