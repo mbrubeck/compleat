@@ -68,7 +68,7 @@ The following are valid patterns:
   the string `x\y`.
 * `a b` matches `a` followed by `b`.
 * `a b | c` matches either `a b` or `c`.
-* `[a]` matches zero or more occurrences of `a`.
+* `[a]` matches zero or one occurrences of `a`.
 * `a ...` matches one or more occurrences of `a`.
 * `[a] ...` matches zero or more occurrences of `a`.
 
