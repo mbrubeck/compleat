@@ -59,9 +59,14 @@ match p suggest ts = case ts of
     [t]    -> [Suggestions $ suggest t]
     (t:ts) -> if p t then continue ts else []
 
+escape :: String -> String
+escape = concatMap escape'
+    where escape' ':' = "\\:"
+          escape' c = [c]
+
 -- Return words 
 matchesFrom :: [String] -> String -> [String]
-matchesFrom xs t = [x ++ " " | x <- xs, t `isPrefixOf` x]
+matchesFrom xs t = [(escape x) ++ " " | x <- xs, t `isPrefixOf` x]
 
 -- Other primitives
 
