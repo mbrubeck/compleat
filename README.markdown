@@ -8,7 +8,7 @@ familiar manpage-like format.  For example, a usage specification for
     top [-b | -c | -H | -i | -s | -S | -d <delay> | -n <num> | -p <pid> ...] ... ;
     top (-h|-v)
 
-The only supported shell at the moment is `bash`.
+The only supported shells at the moment are `bash` and `zsh`.
 
 Installation
 ------------
@@ -33,7 +33,9 @@ To install Compleat in your system, run:
 a `--prefix=PATH` option to change the location, and `--user` to install as a
 non-root user.)
 
-To enable compleat in your shell, add the following line to your `.bashrc`.
+### bash
+
+To enable compleat in bash, add the following line to your `.bashrc`.
 (Adjust the path if you configured with a custom prefix.)
 
     source /usr/local/share/compleat-1.0/compleat_setup
@@ -47,6 +49,40 @@ and install your .usage files in a directory named `/etc/compleat.d` or
 Restart your shell to begin using completions:
 
     exec bash
+
+### zsh
+
+zsh support requires zsh >= 4.2.1, and currently uses zsh's bash-compatibility
+mode rather than taking advantage of zsh's extended completion features.
+
+To enable compleat in zsh, make the following change to your `.zshrc`.
+(Adjust the path if you configured with a custom prefix.)
+
+If you used the zsh wizard (zsh-newuser-install) to set up your `zshrc`, it should contain lines
+like the following (if they don't exist, simply add the lines in the change below):
+
+    autoload -Uz compinit
+    compinit
+
+Change these to:
+
+    autoload -Uz compinit bashcompinit
+    compinit
+    bashcompinit
+
+    source /usr/local/share/compleat-1.0/compleat_setup
+
+and install your .usage files in a directory named `/etc/compleat.d` or
+`~/.compleat`:
+
+    sudo mkdir /etc/compleat.d
+    sudo cp examples/* /etc/compleat.d
+
+Restart your shell to begin using completions:
+
+    exec zsh
+
+### Testing
 
 Type `top` and then press Tab a few times to see the example files in action.
 
