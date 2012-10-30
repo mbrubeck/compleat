@@ -1,7 +1,6 @@
 import Completer (run)
 import Numeric (readDec)
-import System (getArgs)
-import System.Environment (getEnv)
+import System.Environment (getEnv, getArgs)
 import Tokenize (tokenize)
 import Usage (Environment, commands, fromFile, lookupCommand)
 
