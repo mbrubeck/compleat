@@ -11,5 +11,5 @@ Data-Files:          compleat_setup
 Executable compleat
   Main-is:           compleat.hs
   Build-Depends:     base >= 3 && < 5,
-                     parsec < 3,
-                     directory, haskell98, process, unix
+                     parsec >= 2 && < 4,
+                     directory, process, unix

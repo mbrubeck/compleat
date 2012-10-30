@@ -7,7 +7,7 @@ module Completer
     ) where
 import Control.Monad (liftM, sequence)
 import Data.List (isPrefixOf)
-import IO (hGetContents)
+import GHC.IO.Handle (hGetContents)
 import System.Directory (getDirectoryContents)
 import System.Posix.Env (setEnv)
 import System.Process (StdStream(CreatePipe), createProcess, proc, std_out)
