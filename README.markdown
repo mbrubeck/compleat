@@ -16,12 +16,10 @@ Installation
 Get the source code: `git clone git://github.com/mbrubeck/compleat.git`
 
 Next, install GHC and Parsec.  OS X or Windows users, download the [Haskell
-Platform][1].  (Mac OS X 10.6 may require a [workaround][2] for 64-bit
-compatibility.) Debian/Ubuntu users, run: `sudo aptitude install
+Platform][1].  Debian/Ubuntu users, run: `sudo aptitude install
 libghc6-parsec2-dev`
 
 [1]: http://hackage.haskell.org/platform/
-[2]: http://www.haskell.org/haskellwiki/Mac_OS_X
 
 To install Compleat in your system, run: 
 
@@ -29,9 +27,14 @@ To install Compleat in your system, run:
     ./Setup.lhs build
     sudo ./Setup.lhs install
 
-(This will install to `/usr/local` by default.   The "configure" command takes
+This will install to `/usr/local` by default.   The "configure" command takes
 a `--prefix=PATH` option to change the location, and `--user` to install as a
-non-root user.)
+non-root user.
+
+(If you receive an error about the `ld --hash-size=31` option, make sure `ld`
+points to the linker from GNU binutils [rather than the Gold linker][2].)
+
+[2]: http://stackoverflow.com/questions/13046319/haskell-ghc-compiling-linking-error-not-creating-executable-linux
 
 ### bash
 
@@ -43,8 +46,8 @@ To enable compleat in bash, add the following line to your `.bashrc`.
 and install your .usage files in a directory named `/etc/compleat.d` or
 `~/.compleat`:
 
-    sudo mkdir /etc/compleat.d
-    sudo cp examples/* /etc/compleat.d
+    mkdir ~/compleat
+    cp examples/* ~/compleat
 
 Restart your shell to begin using completions:
 
