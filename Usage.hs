@@ -9,10 +9,12 @@ import qualified Text.ParserCombinators.Parsec.Token as T
 -- This module parses the usage file format (see README for an explanation)
 -- and generates a Completer (see the Completer module).
 
-data Usage = Primitive C.Completer | Var String
+data Usage =  Var String
              | Choice [Usage] | Sequence [Usage]
              | Many Usage | Many1 Usage | Optional Usage
              | ShellCommand String
+             | Str String
+             | Skip
 
 fromFile :: String -> IO Environment
 fromFile fileName = do
@@ -32,13 +34,14 @@ lookupCommand env command = eval env (main env)
     where main env = Choice $ map snd $ filter ((CommandName command ==) . fst) env
 
 eval :: Environment -> Usage -> C.Completer
-eval env (Primitive c) = c
 eval env (Choice xs)   = foldl1 (C.<|>) (map (eval env) xs)
 eval env (Sequence xs) = foldl1 (C.-->) (map (eval env) xs)
 eval env (Many x)      = C.many     (eval env x)
 eval env (Many1 x)     = C.many1    (eval env x)
 eval env (Optional x)  = C.optional (eval env x)
 eval env (ShellCommand s) = C.shellCommand s
+eval env (Str s)       = C.str s
+eval env Skip          = C.skip
 eval env (Var s)       = case lookup (VarName s) env of
                             Just u  -> eval env u
                             Nothing -> C.skip
@@ -62,7 +65,7 @@ commandDef :: Parser (EnvName, Usage)
 commandDef = do
     s <- atom
     u <- pattern
-    return (CommandName s, Sequence [Primitive C.skip, u])
+    return (CommandName s, Sequence [Skip, u])
 
 -- Usage parser
 
@@ -87,7 +90,7 @@ optionGroup = brackets pattern
 
 str = do
     s <- atom
-    return $ Primitive (C.str s)
+    return $ Str s
 
 variable = do
     s <- between (symbol "<") (symbol ">") atom
