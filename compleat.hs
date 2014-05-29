@@ -1,6 +1,6 @@
 import Completer (run)
 import Numeric (readDec)
-import System.Environment (getEnv, getArgs)
+import System.Environment (getEnv, getArgs, lookupEnv)
 import Tokenize (tokenize)
 import Usage (Environment, commands, fromFile, lookupCommand)
 
@@ -19,7 +19,13 @@ completeLine env command = do
     line <- getInput
     let completer = lookupCommand env command
     suggestions <- run completer (tokenize line)
-    mapM_ putStrLn suggestions
+    is_fish <- lookupEnv "COMPLEAT_IS_FISH"
+    case is_fish of
+        Nothing -> mapM_ putStrLn suggestions
+        _ -> do
+            -- The trailing space must be removed in fish
+            let suggestions' = map init suggestions
+            mapM_ putStrLn suggestions'
 
 getInput :: IO String
 getInput = do
