@@ -85,6 +85,23 @@ Restart your shell to begin using completions:
 
     exec zsh
 
+### fish
+
+To enable compleat in fish, add the following line to your `~/.config/fish/config.fish`.
+(Adjust the path if you configured with a custom prefix.)
+
+    source /usr/local/share/compleat-1.0/compleat_setup.fish
+
+and install your .usage files in a directory named `/etc/compleat.d` or
+`~/.compleat`:
+
+    mkdir ~/compleat
+    cp examples/* ~/compleat
+
+Restart your shell to begin using completions:
+
+    exec fish
+
 ### Testing
 
 Type `top` and then press Tab a few times to see the example files in action.
