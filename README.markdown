@@ -8,7 +8,7 @@ familiar manpage-like format.  For example, a usage specification for
     top [-b | -c | -H | -i | -s | -S | -d <delay> | -n <num> | -p <pid> ...] ... ;
     top (-h|-v)
 
-The only supported shells at the moment are `bash` and `zsh`.
+Supported shells are `bash`, `fish`, and `zsh`.
 
 Installation
 ------------
