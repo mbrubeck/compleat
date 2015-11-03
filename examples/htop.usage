@@ -1,0 +1,2 @@
+htop [--delay=<DELAY> | --no-colour | --pid=<PID> ... | --sort-key=<COLUMN> | --user=<USERNAME> ] ...;
+htop (--help | --version)
