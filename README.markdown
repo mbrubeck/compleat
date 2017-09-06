@@ -17,7 +17,7 @@ Get the source code: `git clone git://github.com/mbrubeck/compleat.git`
 
 Next, install GHC and Parsec.  OS X or Windows users, download the [Haskell
 Platform][1].  Debian/Ubuntu users, run: `sudo aptitude install
-libghc6-parsec2-dev`
+libghc-parsec3-dev`
 
 [1]: http://hackage.haskell.org/platform/
 
