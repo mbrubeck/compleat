@@ -7,9 +7,14 @@ Author:              Matt Brubeck
 Maintainer:          mbrubeck@limpet.net
 Build-Type:          Simple
 Cabal-Version:       >=1.2
+
 Data-Files:          compleat_setup
+
 Executable compleat
-  Main-is:           compleat.hs
+  Main-Is:           compleat.hs
+  Other-Modules:     Completer,
+                     Tokenize,
+                     Usage
   Build-Depends:     base >= 3 && < 5,
                      parsec >= 2 && < 4,
                      directory, process, unix
