@@ -15,33 +15,21 @@ Installation
 
 Get the source code: `git clone git://github.com/mbrubeck/compleat.git`
 
-Next, install GHC and Parsec.  OS X or Windows users, download the [Haskell
-Platform][1].  Debian/Ubuntu users, run: `sudo aptitude install
-libghc-parsec3-dev`
+Next, install [Stack][stack].
 
-[1]: http://hackage.haskell.org/platform/
+To install Compleat in your system, run:
 
-To install Compleat in your system, run: 
+    make install
 
-    ./Setup.lhs configure
-    ./Setup.lhs build
-    sudo ./Setup.lhs install
-
-This will install to `/usr/local` by default.   The "configure" command takes
-a `--prefix=PATH` option to change the location, and `--user` to install as a
-non-root user.
-
-(If you receive an error about the `ld --hash-size=31` option, make sure `ld`
-points to the linker from GNU binutils [rather than the Gold linker][2].)
-
-[2]: http://stackoverflow.com/questions/13046319/haskell-ghc-compiling-linking-error-not-creating-executable-linux
+This will install the `compleat` binary into `~/.local/bin` and the
+`compleat_setup` script into `~/.bash_completion.d`.
 
 ### bash
 
 To enable compleat in bash, add the following line to your `.bashrc`.
 (Adjust the path if you configured with a custom prefix.)
 
-    source /usr/local/share/compleat-1.0/compleat_setup
+    source ~/.bash_completion.d/compleat_setup
 
 and install your .usage files in a directory named `/etc/compleat.d` or
 `~/.compleat`:
@@ -73,7 +61,7 @@ Change these to:
     compinit
     bashcompinit
 
-    source /usr/local/share/compleat-1.0/compleat_setup
+    source ~/.bash_completion.d/compleat_setup
 
 and install your .usage files in a directory named `/etc/compleat.d` or
 `~/.compleat`:
@@ -87,10 +75,13 @@ Restart your shell to begin using completions:
 
 ### fish
 
-To enable compleat in fish, add the following line to your `~/.config/fish/config.fish`.
-(Adjust the path if you configured with a custom prefix.)
+To install the fish completion file, run:
 
-    source /usr/local/share/compleat-1.0/compleat_setup.fish
+    make install-fish
+
+To enable compleat in fish, add the following line to your `~/.config/fish/config.fish`.
+
+    source ~/.config/fish/compleat_setup.fish
 
 and install your .usage files in a directory named `/etc/compleat.d` or
 `~/.compleat`:
@@ -174,3 +165,6 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
+
+
+[stack]: https://docs.haskellstack.org/en/stable/README/#how-to-install
