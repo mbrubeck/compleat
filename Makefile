@@ -12,3 +12,4 @@ install-fish: build
 	stack install
 	install -d ~/.config/fish
 	install -m 0644 compleat_setup.fish ~/.config/fish
+.PHONY: install-fish
