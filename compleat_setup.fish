@@ -5,10 +5,11 @@ function _run_compleat
     compleat $argv
 end
 
+[ -n "$COMPLEAT_VENDOR_DIR" ]; or set COMPLEAT_SYSTEM_DIR /usr/share/compleat.d
 [ -n "$COMPLEAT_SYSTEM_DIR" ]; or set COMPLEAT_SYSTEM_DIR /etc/compleat.d
 [ -n "$COMPLEAT_USER_DIR"   ]; or set COMPLEAT_USER_DIR $HOME/.compleat
 
-for DIR in $COMPLEAT_SYSTEM_DIR $COMPLEAT_USER_DIR
+for DIR in $COMPLEAT_VENDOR_DIR $COMPLEAT_SYSTEM_DIR $COMPLEAT_USER_DIR
     if [ -d $DIR -a -r $DIR -a -x $DIR ]
         for FILE in $DIR/*.usage
             for COMMAND in (compleat $FILE)

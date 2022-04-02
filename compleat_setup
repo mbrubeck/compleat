@@ -4,10 +4,11 @@ _run_compleat() {
     compleat $@
 }
 
+[ -n "$COMPLEAT_VENDOR_DIR" ] || COMPLEAT_SYSTEM_DIR=/usr/share/compleat.d
 [ -n "$COMPLEAT_SYSTEM_DIR" ] || COMPLEAT_SYSTEM_DIR=/etc/compleat.d
 [ -n "$COMPLEAT_USER_DIR"   ] || COMPLEAT_USER_DIR=$HOME/.compleat
 
-for DIR in $COMPLEAT_SYSTEM_DIR $COMPLEAT_USER_DIR; do
+for DIR in $COMPLEAT_VENDOR_DIR $COMPLEAT_SYSTEM_DIR $COMPLEAT_USER_DIR; do
     if [ -d $DIR -a -r $DIR -a -x $DIR ]; then
         for FILE in $DIR/*.usage; do
             for COMMAND in `compleat $FILE`; do
