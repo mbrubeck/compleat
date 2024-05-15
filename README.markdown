@@ -22,14 +22,16 @@ To install Compleat in your system, run:
     make install
 
 This will install the `compleat` binary into `~/.local/bin` and the
-`compleat_setup` script into `~/.bash_completion.d`.
+`compleat_setup` script into `$BASH_COMPLETION_USER_DIR` (defaults to
+`$XDG_DATA_HOME/bash-completion/completions` or
+`~/.local/share/bash-completion/completions`):
 
 ### bash
 
 To enable compleat in bash, add the following line to your `.bashrc`.
 (Adjust the path if you configured with a custom prefix.)
 
-    source ~/.bash_completion.d/compleat_setup
+    source ${BASH_COMPLETION_USER_DIR}/compleat_setup
 
 and install your .usage files in a directory named `/etc/compleat.d` or
 `~/.compleat`:
